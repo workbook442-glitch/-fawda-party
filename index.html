@@ -38,14 +38,16 @@ input{padding:12px;border-radius:12px;border:0;width:100%;margin:8px 0}
 <section class="panel">
   <h2>🏟️ ساحة التحديات 3D</h2>
   <div id="stage">
-    <div class="hud"><span class="pill" id="charLabel">🐼 باندا</span><span class="pill">اسحب الشاشة لتدوير الكاميرا</span></div>
+    <div class="hud"><span class="pill" id="charLabel">🐼 باندا</span><span class="pill">🪙 <span id="arenaCoins">0</span>/8</span><span class="pill" id="timerHud">⏱️ 60</span></div>
     <div class="controls">
       <button id="left" aria-label="يسار">◀</button>
       <button id="jump" aria-label="قفز">⬆</button>
       <button id="right" aria-label="يمين">▶</button>
     </div>
   </div>
-  <p class="small">حرّك الشخصية بالأسهم، واقفز بالزر الأوسط. اسحب الساحة لتغيير زاوية الرؤية.</p>
+  <p class="small">اجمع العملات الذهبية بالقفز والتحرك داخل الساحة. استخدم الأسهم أو أزرار الشاشة، وزر القفز لتفادي العوائق.</p>
+  <div class="row"><button id="startRound">ابدأ جولة 60 ثانية</button><button id="resetRound" class="alt">إعادة الجولة</button></div>
+  <p class="muted" id="roundMessage">اجمع أكبر عدد من العملات قبل انتهاء الوقت!</p>
 </section>
 
 <section class="panel">
@@ -93,6 +95,16 @@ const inner=new THREE.Mesh(new THREE.CylinderGeometry(5.25,5.25,.12,64),mat(0x6b
 for(let i=0;i<10;i++){const a=i*Math.PI*2/10;const g=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(.8,.8,.8),mat([0xff6b9d,0x8d79ff,0xffc857,0x53c8ff][i%4]));b.position.y=.62;b.castShadow=true;g.add(b);g.position.set(Math.cos(a)*4.65,0,Math.sin(a)*4.65);g.rotation.y=a;scene.add(g);}
 for(let i=0;i<18;i++){const a=i*Math.PI*2/18;const m=new THREE.Mesh(new THREE.SphereGeometry(.12,12,10),mat(i%2?0xffffff:0xffe36b));m.position.set(Math.cos(a)*5.65,.55,Math.sin(a)*5.65);scene.add(m);}
 
+// Collectible golden rings placed around the arena
+const pickups=[];
+for(let i=0;i<8;i++){
+ const a=i*Math.PI/4+.2;
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(.28,.09,10,22),new THREE.MeshStandardMaterial({color:0xffd21f,metalness:.65,roughness:.25,emissive:0x6b3b00,emissiveIntensity:.25}));
+ ring.position.set(Math.cos(a)*3.15,1.05,Math.sin(a)*3.15);
+ ring.rotation.x=Math.PI/2;
+ ring.castShadow=true;scene.add(ring);pickups.push({mesh:ring,active:true});
+}
+
 function makeAnimal(type){
  const group=new THREE.Group();
  const colors={panda:[0xffffff,0x222438],fox:[0xff9b38,0x7a3422],cat:[0xffc5e7,0x9b4f9b],raccoon:[0x999eae,0x34394a],duck:[0xffdf43,0xe89b20]};
@@ -126,6 +138,26 @@ renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.cli
 window.addEventListener('pointerup',()=>dragging=false);
 window.addEventListener('pointermove',e=>{if(dragging){turn+=(e.clientX-lastX)*.008;lastX=e.clientX;}});
 const clock=new THREE.Clock();
+let roundActive=false, roundTime=60, collected=0, roundInterval=null;
+const timerHud=document.getElementById('timerHud');
+const arenaCoins=document.getElementById('arenaCoins');
+const roundMessage=document.getElementById('roundMessage');
+function startRound(){
+ roundActive=true;roundTime=60;collected=0;
+ pickups.forEach(p=>{p.active=true;p.mesh.visible=true;});
+ arenaCoins.textContent='0';timerHud.textContent='⏱️ 60';
+ roundMessage.textContent='يلا اجمع العملات الذهبية! 🪙';
+ if(roundInterval)clearInterval(roundInterval);
+ roundInterval=setInterval(()=>{
+  if(!roundActive)return;
+  roundTime--;timerHud.textContent='⏱️ '+roundTime;
+  if(roundTime<=0){roundActive=false;clearInterval(roundInterval);roundMessage.textContent='انتهى الوقت! جمعت '+collected+' عملة 🎉';}
+ },1000);
+}
+document.getElementById('startRound').onclick=startRound;
+document.getElementById('resetRound').onclick=()=>{if(roundInterval)clearInterval(roundInterval);startRound();player.position.set(0,.25,0);};
+window.addEventListener('keydown',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.left=true;if(['ArrowRight','d','D'].includes(e.key))keys.right=true;if(['ArrowUp','w','W',' '].includes(e.key)&&grounded){vy=7.2;grounded=false;}});
+window.addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.left=false;if(['ArrowRight','d','D'].includes(e.key))keys.right=false;});
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
  if(keys.left){player.position.x-=4*dt;player.rotation.y=-.35;}if(keys.right){player.position.x+=4*dt;player.rotation.y=.35;}
  player.position.x=THREE.MathUtils.clamp(player.position.x,-4.3,4.3);
@@ -133,6 +165,16 @@ function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDel
  player.position.z=Math.sin(clock.elapsedTime*2)*.08;
  player.rotation.y+=(turn-player.rotation.y)*.025;
  player.children[0].rotation.z=Math.sin(clock.elapsedTime*8)*.04;
+ pickups.forEach(p=>{
+  if(!p.active)return;
+  p.mesh.rotation.z+=dt*2.4;p.mesh.rotation.y+=dt*1.5;
+  const dx=player.position.x-p.mesh.position.x,dz=player.position.z-p.mesh.position.z;
+  if(roundActive && Math.hypot(dx,dz)<.62 && player.position.y<1.15){
+   p.active=false;p.mesh.visible=false;collected++;arenaCoins.textContent=String(collected);
+   roundMessage.textContent='جميل! جمعت '+collected+' من 8 عملات ⭐';
+   if(collected===8){roundActive=false;if(roundInterval)clearInterval(roundInterval);roundMessage.textContent='أسطورة! جمعت كل العملات! 🏆';if(window.awardArenaCoins)window.awardArenaCoins(20);}
+  }
+ });
  camera.position.x=Math.sin(turn)*2;camera.position.z=11*Math.cos(turn)+1;camera.lookAt(0,1,0);
  renderer.render(scene,camera);
 }
@@ -148,5 +190,6 @@ $("new").onclick=()=>{current=tasks[Math.floor(Math.random()*tasks.length)];$("c
 $("done").onclick=()=>{if(!current){$("challenge").textContent="اختار تحدي جديد الأول!";return;}score+=10;coins+=5;current="";$("challenge").textContent="برافو! كسبت 10 نقاط و5 عملات 🎉";render();};
 $("room").onclick=()=>{$("roomcode").textContent="كود الغرفة التجريبي: "+Math.random().toString(36).slice(2,7).toUpperCase();};
 render();
+window.awardArenaCoins=(amount)=>{coins+=amount;score+=amount*2;render();};
 </script>
 </body></html>
