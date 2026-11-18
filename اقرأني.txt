@@ -1,0 +1,1 @@
+ارفع محتويات هذا المجلد إلى جذر مستودع GitHub. بعد ذلك فعّل GitHub Pages من Settings > Pages واختر Deploy from a branch ثم main و/(root). هذه نسخة ويب تجريبية؛ الغرف ليست أونلاين حقيقية ولا تحتوي نماذج 3D أو APK.

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#171024"><link rel="manifest" href="manifest.webmanifest">
+<title>فوضى التحديات</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:radial-gradient(circle at top,#47245d,#130f20 65%);color:#fff;min-height:100vh;padding:18px}
+main{max-width:620px;margin:auto}.card{background:#ffffff12;border:1px solid #ffffff25;border-radius:22px;padding:20px;margin:14px 0;box-shadow:0 12px 35px #0005}
+h1{font-size:2rem;margin:.3em 0;color:#ffd5f4}h2{color:#ffe0f6}button{border:0;border-radius:14px;padding:13px 18px;margin:5px;background:#ff70c5;color:#28112a;font-weight:800;font-size:1rem}
+button.alt{background:#ffffff20;color:white;border:1px solid #ffffff30}.animal{font-size:3rem}.muted{color:#d9c9df}.row{display:flex;flex-wrap:wrap;gap:8px}.score{font-size:1.3rem;color:#ffe28a}#challenge{font-size:1.35rem;line-height:1.8;min-height:90px}input{padding:12px;border-radius:12px;border:0;width:100%;margin:8px 0}
+</style></head>
+<body><main>
+<header class="card"><div class="animal">🐼 🦊 🦝</div><h1>فوضى التحديات</h1><p class="muted">العب، اضحك، واجمع النقاط مع أصحابك!</p><div class="score">⭐ النقاط: <span id="score">0</span>　🪙 العملات: <span id="coins">0</span></div></header>
+<section class="card"><h2>اختار شخصيتك</h2><div class="row" id="animals"><button class="alt" data-a="🐼 باندا">🐼 باندا</button><button class="alt" data-a="🦊 ثعلوب">🦊 ثعلوب</button><button class="alt" data-a="🦆 بطبوط">🦆 بطبوط</button><button class="alt" data-a="🐱 قطقوط">🐱 قطقوط</button><button class="alt" data-a="🦝 راكون">🦝 راكون</button></div><p id="chosen" class="muted">شخصيتك: 🐼 باندا</p></section>
+<section class="card"><h2>جولة التحديات</h2><div id="challenge">اضغط «تحدي جديد» عشان تبدأ الضحك!</div><div class="row"><button id="new">تحدي جديد</button><button id="done" class="alt">خلصت التحدي +10</button></div><p class="muted">الجولات محلية على نفس الجهاز — اللعب الجماعي أونلاين غير مفعّل في هذه النسخة.</p></section>
+<section class="card"><h2>غرفة الأصدقاء</h2><p class="muted">واجهة تجريبية للغرف. الاتصال الحقيقي بين اللاعبين يحتاج خادم أونلاين.</p><button class="alt" id="room">إنشاء كود غرفة تجريبي</button><p id="roomcode"></p></section>
+<section class="card"><h2>المتجر</h2><p>🎩 قبعة النجوم — 30 عملة</p><button id="buy" class="alt">شراء تجريبي</button><p id="shopmsg" class="muted"></p></section>
+</main>
+<script>
+const tasks=["اتكلم بصوت مذيع أخبار لمدة 20 ثانية","قلّد صوت حيوان وخلي أصحابك يخمنوا","احكي موقف مضحك حصل لك","اعمل وش مضحك لمدة 10 ثواني","غنّي جملة من أغنية بصوت روبوت","امدح اللاعب اللي على يمينك بطريقة كوميدية","اتكلم من غير حرف الميم لمدة 15 ثانية","مثّل إنك بتكسب مليون جنيه"];
+let score=+(localStorage.fpScore||0),coins=+(localStorage.fpCoins||0),current="";const $=id=>document.getElementById(id);
+function render(){$("score").textContent=score;$("coins").textContent=coins;localStorage.fpScore=score;localStorage.fpCoins=coins}
+document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{$("chosen").textContent="شخصيتك: "+b.dataset.a});
+$("new").onclick=()=>{current=tasks[Math.floor(Math.random()*tasks.length)];$("challenge").textContent=current};
+$("done").onclick=()=>{if(!current){$("challenge").textContent="اختار تحدي جديد الأول!";return}score+=10;coins+=5;current="";$("challenge").textContent="برافو! كسبت 10 نقاط و5 عملات 🎉";render()};
+$("room").onclick=()=>{$("roomcode").textContent="كود الغرفة التجريبي: "+Math.random().toString(36).slice(2,7).toUpperCase()};
+$("buy").onclick=()=>{if(coins>=30){coins-=30;$("shopmsg").textContent="مبروك! اشتريت القبعة 🎩"}else $("shopmsg").textContent="اجمع 30 عملة الأول!";render()};render();
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js"));
+</script></body></html>
