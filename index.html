@@ -3,193 +3,102 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#171024">
-<title>فوضى التحديات - ساحة 3D</title>
+<title>فوضى التحديات - مغامرة 3D</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#41215b,#100d1b 70%);color:#fff;font-family:system-ui,Arial;min-height:100vh}
-main{max-width:760px;margin:auto;padding:14px}
-header,.panel{background:#ffffff12;border:1px solid #ffffff26;border-radius:20px;padding:15px;margin:12px 0;box-shadow:0 10px 28px #0005}
-h1{margin:2px 0;color:#ffe0f7;font-size:1.8rem}h2{margin:4px 0 12px;color:#ffe0f7;font-size:1.15rem}
-.muted{color:#d8c8e1;font-size:.92rem;line-height:1.7}
-.stats{color:#ffe28a;font-weight:800}
-#stage{height:390px;position:relative;overflow:hidden;border-radius:22px;border:2px solid #ffffff35;background:linear-gradient(#6ac9ff,#d7f4ff 55%,#7cdebd 56%,#4cbd9a);touch-action:pan-y}
-#stage canvas{display:block;width:100%;height:100%}
-.hud{position:absolute;top:10px;right:10px;left:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
-.pill{background:#180e2bd9;border:1px solid #ffffff55;border-radius:14px;padding:7px 10px;font-weight:800;font-size:.82rem}
-.controls{position:absolute;bottom:12px;left:12px;display:flex;gap:9px;direction:ltr}
-.controls button{width:58px;height:54px;border-radius:17px;background:#24103bdc;color:#fff;border:1px solid #ffffff70;font-size:1.35rem;font-weight:900;touch-action:none}
-button{border:0;border-radius:13px;padding:12px 16px;margin:4px;background:#ff78c9;color:#28112a;font-weight:900;font-size:1rem}
-button.alt{background:#ffffff20;color:#fff;border:1px solid #ffffff38}
-.row{display:flex;flex-wrap:wrap;gap:6px}.animal{font-size:1.5rem}
-#challenge{font-size:1.15rem;line-height:1.8;min-height:55px}
-input{padding:12px;border-radius:12px;border:0;width:100%;margin:8px 0}
-.small{font-size:.8rem;color:#d9c9df}
-@media(max-width:420px){#stage{height:340px}.controls button{width:52px;height:50px}}
+:root{--glass:rgba(13,22,39,.72);--line:rgba(255,255,255,.18)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101d32;font-family:system-ui,Tahoma,Arial;color:#fff;touch-action:none}
+#game{position:fixed;inset:0}canvas{display:block}
+#hud{position:fixed;inset:0;pointer-events:none}
+.top{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.panel{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:9px 13px;backdrop-filter:blur(10px);box-shadow:0 8px 28px #0004}
+.stat{font-weight:800;font-size:14px}.stat small{display:block;font-size:10px;opacity:.72;font-weight:600}
+#message{position:absolute;top:86px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#101b30c9;padding:9px 16px;border:1px solid var(--line);border-radius:20px;font-size:13px}
+#joystick{position:absolute;bottom:24px;left:22px;width:138px;height:138px;border-radius:50%;background:#ffffff20;border:2px solid #ffffff4a;pointer-events:auto;touch-action:none;box-shadow:inset 0 0 20px #0003}
+#stick{position:absolute;left:40px;top:40px;width:54px;height:54px;border-radius:50%;background:linear-gradient(145deg,#fff,#a9c9ff);box-shadow:0 5px 16px #0007;border:2px solid #fff}
+.actions{position:absolute;bottom:28px;right:20px;display:flex;gap:12px;align-items:flex-end;pointer-events:auto}
+.action{border:2px solid #ffffff80;border-radius:50%;width:68px;height:68px;color:white;font-weight:900;font-size:13px;background:linear-gradient(145deg,#ff9e38,#ed4d64);box-shadow:0 7px 18px #0006;touch-action:none}
+#jump{width:78px;height:78px;background:linear-gradient(145deg,#48d6c8,#1685d4)}
+#start{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:auto;border:0;border-radius:18px;padding:15px 28px;color:#fff;font-weight:900;font-size:18px;background:linear-gradient(120deg,#ff8a36,#e83f75);box-shadow:0 12px 35px #0008}
+#hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:10px;opacity:.75;white-space:nowrap}
+@media(min-width:700px){#joystick{width:150px;height:150px}#stick{left:46px;top:46px}}
 </style>
 </head>
-<body><main>
-<header>
-  <div class="animal">🐼 🦊 🐱 🦝 🦆</div>
-  <h1>فوضى التحديات</h1>
-  <div class="muted">أهلاً بيك في أول ساحة ثلاثية الأبعاد!</div>
-  <p class="stats">⭐ النقاط: <span id="score">0</span>　🪙 العملات: <span id="coins">0</span></p>
-</header>
-
-<section class="panel">
-  <h2>🏟️ ساحة التحديات 3D</h2>
-  <div id="stage">
-    <div class="hud"><span class="pill" id="charLabel">🐼 باندا</span><span class="pill">🪙 <span id="arenaCoins">0</span>/8</span><span class="pill" id="timerHud">⏱️ 60</span></div>
-    <div class="controls">
-      <button id="left" aria-label="يسار">◀</button>
-      <button id="jump" aria-label="قفز">⬆</button>
-      <button id="right" aria-label="يمين">▶</button>
-    </div>
-  </div>
-  <p class="small">اجمع العملات الذهبية بالقفز والتحرك داخل الساحة. استخدم الأسهم أو أزرار الشاشة، وزر القفز لتفادي العوائق.</p>
-  <div class="row"><button id="startRound">ابدأ جولة 60 ثانية</button><button id="resetRound" class="alt">إعادة الجولة</button></div>
-  <p class="muted" id="roundMessage">اجمع أكبر عدد من العملات قبل انتهاء الوقت!</p>
-</section>
-
-<section class="panel">
-  <h2>اختار بطلك</h2>
-  <div class="row" id="animals">
-    <button class="alt" data-a="panda">🐼 باندا</button>
-    <button class="alt" data-a="fox">🦊 ثعلوب</button>
-    <button class="alt" data-a="cat">🐱 قطقوط</button>
-    <button class="alt" data-a="raccoon">🦝 راكون</button>
-    <button class="alt" data-a="duck">🦆 بطبوط</button>
-  </div>
-</section>
-
-<section class="panel">
-  <h2>🎯 جولة التحديات</h2>
-  <div id="challenge">اضغط «تحدي جديد» عشان تبدأ!</div>
-  <div class="row"><button id="new">تحدي جديد</button><button id="done" class="alt">خلصت التحدي +10</button></div>
-  <p class="muted">النقاط والعملات محفوظة على جهازك. الغرف والأونلاين الحقيقي هنضيفهم في مرحلة لاحقة.</p>
-</section>
-<section class="panel">
-  <h2>👥 غرفة الأصدقاء</h2>
-  <p class="muted">الغرف هنا تجريبية فقط في المرحلة دي.</p>
-  <button id="room" class="alt">إنشاء كود غرفة تجريبي</button><p id="roomcode"></p>
-</section>
-</main>
-
+<body>
+<div id="game"></div>
+<div id="hud">
+ <div class="top">
+  <div class="panel stat">🪙 <span id="coins">0</span><small>العملات</small></div>
+  <div class="panel stat">🏆 <span id="score">0</span><small>النقاط</small></div>
+  <div class="panel stat">⏱️ <span id="time">60</span><small>الوقت</small></div>
+ </div>
+ <div id="message">استكشف الساحة واجمع العملات!</div>
+ <button id="start">ابدأ المغامرة 🎮</button>
+ <div id="joystick"><div id="stick"></div></div>
+ <div class="actions"><button class="action" id="jump">قفز</button><button class="action" id="run">جري</button></div>
+ <div id="hint">حرّك العصا في أي اتجاه — الكاميرا تتبعك من الخلف</div>
+</div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-
-const stage=document.getElementById('stage');
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x8bd8ff); scene.fog=new THREE.Fog(0x8bd8ff,16,35);
-const camera=new THREE.PerspectiveCamera(48,stage.clientWidth/stage.clientHeight,.1,100);
-camera.position.set(0,6.5,11); camera.lookAt(0,1,0);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(stage.clientWidth,stage.clientHeight); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-stage.prepend(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xffffff,0x4b6b88,2));
-const sun=new THREE.DirectionalLight(0xffffff,2.5); sun.position.set(-5,10,7); sun.castShadow=true; scene.add(sun);
-
-const mat=(c,rough=.75)=>new THREE.MeshStandardMaterial({color:c,roughness:rough});
-const ground=new THREE.Mesh(new THREE.CircleGeometry(13,64),mat(0x45c58f));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);
-const platform=new THREE.Mesh(new THREE.CylinderGeometry(5.8,6.2,.28,64),mat(0xffd36e));platform.position.y=.02;platform.receiveShadow=true;platform.castShadow=true;scene.add(platform);
-const inner=new THREE.Mesh(new THREE.CylinderGeometry(5.25,5.25,.12,64),mat(0x6bdbce));inner.position.y=.22;scene.add(inner);
-// colorful obstacles around the arena
-for(let i=0;i<10;i++){const a=i*Math.PI*2/10;const g=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(.8,.8,.8),mat([0xff6b9d,0x8d79ff,0xffc857,0x53c8ff][i%4]));b.position.y=.62;b.castShadow=true;g.add(b);g.position.set(Math.cos(a)*4.65,0,Math.sin(a)*4.65);g.rotation.y=a;scene.add(g);}
-for(let i=0;i<18;i++){const a=i*Math.PI*2/18;const m=new THREE.Mesh(new THREE.SphereGeometry(.12,12,10),mat(i%2?0xffffff:0xffe36b));m.position.set(Math.cos(a)*5.65,.55,Math.sin(a)*5.65);scene.add(m);}
-
-// Collectible golden rings placed around the arena
-const pickups=[];
-for(let i=0;i<8;i++){
- const a=i*Math.PI/4+.2;
- const ring=new THREE.Mesh(new THREE.TorusGeometry(.28,.09,10,22),new THREE.MeshStandardMaterial({color:0xffd21f,metalness:.65,roughness:.25,emissive:0x6b3b00,emissiveIntensity:.25}));
- ring.position.set(Math.cos(a)*3.15,1.05,Math.sin(a)*3.15);
- ring.rotation.x=Math.PI/2;
- ring.castShadow=true;scene.add(ring);pickups.push({mesh:ring,active:true});
-}
-
-function makeAnimal(type){
- const group=new THREE.Group();
- const colors={panda:[0xffffff,0x222438],fox:[0xff9b38,0x7a3422],cat:[0xffc5e7,0x9b4f9b],raccoon:[0x999eae,0x34394a],duck:[0xffdf43,0xe89b20]};
- const [base,dark]=colors[type]||colors.panda;
- const body=new THREE.Mesh(new THREE.SphereGeometry(.57,24,18),mat(base));body.scale.set(.85,1.05,.72);body.position.y=.85;body.castShadow=true;group.add(body);
- const head=new THREE.Mesh(new THREE.SphereGeometry(.58,28,22),mat(base));head.position.y=1.72;head.castShadow=true;group.add(head);
- const earGeo=type==='duck'?new THREE.SphereGeometry(.17,16,12):new THREE.SphereGeometry(.22,16,12);
- for(const x of [-.39,.39]){const ear=new THREE.Mesh(earGeo,mat(type==='fox'?dark:base));ear.position.set(x,2.16,0);ear.scale.set(1,1.2,.65);group.add(ear);}
- // eyes and eye patches
- for(const x of [-.21,.21]){
-  if(type==='panda'||type==='raccoon'){const patch=new THREE.Mesh(new THREE.SphereGeometry(.19,16,12),mat(dark));patch.position.set(x,1.82,.49);patch.scale.set(.8,1.15,.35);group.add(patch);}
-  const eye=new THREE.Mesh(new THREE.SphereGeometry(.065,12,10),mat(0x171421));eye.position.set(x,1.84,.59);group.add(eye);
-  const shine=new THREE.Mesh(new THREE.SphereGeometry(.022,8,8),mat(0xffffff));shine.position.set(x-.018,1.87,.64);group.add(shine);
+const root=document.getElementById('game');
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x8ed8ff); scene.fog=new THREE.Fog(0x8ed8ff,28,90);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,150);
+const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap; renderer.outputColorSpace=THREE.SRGBColorSpace; root.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xeaf8ff,0x6d7f53,2.0));
+const sun=new THREE.DirectionalLight(0xfff2d5,2.4); sun.position.set(-12,22,10); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
+const mat=(c,r=.8,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const grass=mat(0x5ebd68), path=mat(0xd8bd86), rock=mat(0x7f91a5), wood=mat(0x80502f), leaf=mat(0x248b58), gold=new THREE.MeshStandardMaterial({color:0xffc928,metalness:.65,roughness:.25,emissive:0x684300});
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(100,100),grass);floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+const trail=new THREE.Mesh(new THREE.PlaneGeometry(7,100),path);trail.rotation.x=-Math.PI/2;trail.position.set(0,.012,0);trail.receiveShadow=true;scene.add(trail);
+function box(w,h,d,material,x,y,z){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
+function tree(x,z,s=1){let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22*s,.32*s,2*s,8),wood);trunk.position.set(x,s,z);trunk.castShadow=true;scene.add(trunk);let crown=new THREE.Mesh(new THREE.IcosahedronGeometry(1.25*s,1),leaf);crown.position.set(x,2.5*s,z);crown.castShadow=true;scene.add(crown);let crown2=new THREE.Mesh(new THREE.IcosahedronGeometry(.8*s,1),mat(0x39aa65));crown2.position.set(x+.45*s,2.9*s,z-.2*s);scene.add(crown2)}
+for(let z=-42;z<48;z+=9){tree(-7-(Math.sin(z)*1.5),z,.8+Math.abs(Math.sin(z))*.25);tree(7+(Math.cos(z)*1.5),z,.85+Math.abs(Math.cos(z))*.2)}
+// decorative rocks and stepping platforms
+for(let i=0;i<16;i++){let x=(Math.sin(i*8.1)*1.8)+(i%2?3.5:-3.5),z=-35+i*4.5;let r=new THREE.Mesh(new THREE.DodecahedronGeometry(.65+(i%3)*.18),rock);r.position.set(x,.45,z);r.scale.y=.7;r.castShadow=true;scene.add(r)}
+// animal adventurer: cute fox-like character
+const player=new THREE.Group();scene.add(player);
+const orange=mat(0xf28b35),cream=mat(0xffe3b8),dark=mat(0x392b38),eye=mat(0x171923,.3);
+function sph(parent,geo,material,x,y,z,sx=1,sy=1,sz=1){let o=new THREE.Mesh(geo,material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;parent.add(o);return o}
+sph(player,new THREE.SphereGeometry(.55,24,18),orange,0,1.05,0, .82,1.05,.68);
+sph(player,new THREE.SphereGeometry(.48,24,18),orange,0,1.85,-.03,1, .9,.9);
+sph(player,new THREE.SphereGeometry(.29,20,16),cream,0,1.67,.37,1,.65,.45);
+sph(player,new THREE.SphereGeometry(.09,16,12),dark,0,1.78,.72,1,1,.7);
+for(let side of [-1,1]){sph(player,new THREE.ConeGeometry(.2,.55,12),orange,side*.31,2.35,-.05,1,1,1).rotation.z=side*-.22;sph(player,new THREE.SphereGeometry(.075,12,10),eye,side*.19,1.96,.72,.8,1,.5)}
+const tail=sph(player,new THREE.ConeGeometry(.28,.9,16),orange,0,.85,-.72);tail.rotation.x=-1.0;
+for(let side of [-1,1]){let leg=sph(player,new THREE.CapsuleGeometry(.13,.42,4,8),dark,side*.25,.35,0);leg.rotation.x=.12}
+player.position.set(0,0,8);
+// coin line with varied positions
+const coins=[];
+for(let i=0;i<12;i++){let c=new THREE.Mesh(new THREE.TorusGeometry(.38,.12,10,24),gold);c.position.set(Math.sin(i*1.7)*3.2,1.25,-5-i*5.5);c.castShadow=true;scene.add(c);coins.push(c)}
+// colorful checkpoint arches
+for(let z=-16;z>-48;z-=16){let a=box(.35,3,.35,mat(0x4d7bdb),-3.4,1.5,z);let b=box(.35,3,.35,mat(0x4d7bdb),3.4,1.5,z);box(6.8,.35,.35,mat(0xf4b942),0,3,z)}
+// movement state
+let active=false,remaining=60,collected=0,score=0,velocityY=0,onGround=true,move={x:0,y:0},running=false;
+let yaw=0;const clock=new THREE.Clock();
+const joy=document.getElementById('joystick'),stick=document.getElementById('stick');let joyId=null;
+function setJoy(e){let r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,len=Math.hypot(dx,dy),max=48;if(len>max){dx=dx/len*max;dy=dy/len*max}stick.style.transform=`translate(${dx}px,${dy}px)`;move.x=dx/max;move.y=-dy/max}
+joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(joyId);setJoy(e)});
+joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)setJoy(e)});
+function resetJoy(){joyId=null;move={x:0,y:0};stick.style.transform='translate(0,0)'}
+joy.addEventListener('pointerup',resetJoy);joy.addEventListener('pointercancel',resetJoy);
+document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();if(active&&onGround){velocityY=8.5;onGround=false}});
+document.getElementById('run').addEventListener('pointerdown',()=>running=true);document.getElementById('run').addEventListener('pointerup',()=>running=false);document.getElementById('run').addEventListener('pointerleave',()=>running=false);
+addEventListener('keydown',e=>{if(e.key===' '&&onGround&&active){velocityY=8.5;onGround=false} if(e.key==='Shift')running=true});
+addEventListener('keyup',e=>{if(e.key==='Shift')running=false});
+document.getElementById('start').onclick=()=>{active=true;remaining=60;collected=0;score=0;player.position.set(0,0,8);document.getElementById('start').style.display='none';document.getElementById('message').textContent='انطلق! اجمع العملات وتجاوز العقبات';document.getElementById('coins').textContent='0';document.getElementById('score').textContent='0'};
+function update(dt){
+ if(active){remaining-=dt;if(remaining<=0){remaining=0;active=false;document.getElementById('start').textContent='العب مرة تانية 🔄';document.getElementById('start').style.display='block';document.getElementById('message').textContent=`انتهت المغامرة! جمعت ${collected} عملة`;}
+ let forward=move.y,side=move.x;let mag=Math.hypot(forward,side);if(mag>.08){let speed=(running?10:6)*Math.min(mag,1);let desired=Math.atan2(side,forward);yaw=desired;player.rotation.y=yaw;player.position.x+=Math.sin(yaw)*speed*dt;player.position.z-=Math.cos(yaw)*speed*dt}
+ player.position.x=THREE.MathUtils.clamp(player.position.x,-5.5,5.5);
+ velocityY-=20*dt;player.position.y+=velocityY*dt;if(player.position.y<=0){player.position.y=0;velocityY=0;onGround=true}
+ for(let c of coins){if(c.visible&&player.position.distanceTo(c.position)<1.35){c.visible=false;collected++;score+=100;document.getElementById('coins').textContent=collected;document.getElementById('score').textContent=score;document.getElementById('message').textContent='عملة جديدة! ممتاز 🪙'}}
  }
- const muzzle=new THREE.Mesh(new THREE.SphereGeometry(type==='duck'?.19:.22,16,12),mat(type==='duck'?0xff8b28:0xffffff));muzzle.position.set(0,1.57,.53);muzzle.scale.set(1,.65,.55);group.add(muzzle);
- if(type==='duck'){const bill=new THREE.Mesh(new THREE.ConeGeometry(.18,.3,16),mat(0xff7a1b));bill.rotation.x=Math.PI/2;bill.position.set(0,1.56,.78);group.add(bill);}
- const belly=new THREE.Mesh(new THREE.SphereGeometry(.38,18,14),mat(type==='panda'?0xf4f4f4:0xffe5b5));belly.position.set(0,.83,.48);belly.scale.set(1,.95,.25);group.add(belly);
- for(const x of [-.32,.32]){const leg=new THREE.Mesh(new THREE.SphereGeometry(.2,14,12),mat(dark));leg.position.set(x,.27,.04);leg.scale.set(1,.8,1.2);group.add(leg);}
- const tail=new THREE.Mesh(new THREE.SphereGeometry(.22,14,12),mat(type==='fox'?dark:base));tail.position.set(0,.8,-.62);tail.scale.set(.8,.8,1.5);group.add(tail);
- group.userData={legs:group.children.filter((o,i)=>i>0),type};return group;
+ for(let c of coins){if(c.visible){c.rotation.y+=dt*2.2;c.position.y=1.25+Math.sin(clock.elapsedTime*2+c.position.z)*.16}}
+ // chase camera behind the character, smoothly following heading
+ const behind=new THREE.Vector3(Math.sin(yaw)*8,5.2,Math.cos(yaw)*8);
+ const targetCam=player.position.clone().add(behind);camera.position.lerp(targetCam,1-Math.pow(.001,dt));camera.lookAt(player.position.x,1.25,player.position.z-1.2);
+ document.getElementById('time').textContent=Math.ceil(remaining);
 }
-let type='panda',player=makeAnimal(type);scene.add(player);player.position.set(0,.25,0);
-const keys={left:false,right:false};let vy=0,grounded=true,turn=0;
-function choose(t){scene.remove(player);type=t;player=makeAnimal(type);scene.add(player);player.position.set(0,.25,0);document.getElementById('charLabel').textContent=({panda:'🐼 باندا',fox:'🦊 ثعلوب',cat:'🐱 قطقوط',raccoon:'🦝 راكون',duck:'🦆 بطبوط'})[t];}
-document.querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.a)));
-function bindHold(id,key){const el=document.getElementById(id);const on=e=>{e.preventDefault();keys[key]=true},off=e=>{e.preventDefault();keys[key]=false};el.addEventListener('pointerdown',on);['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,off));}
-bindHold('left','left');bindHold('right','right');
-document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();if(grounded){vy=7.2;grounded=false;}});
-let dragging=false,lastX=0;
-renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;});
-window.addEventListener('pointerup',()=>dragging=false);
-window.addEventListener('pointermove',e=>{if(dragging){turn+=(e.clientX-lastX)*.008;lastX=e.clientX;}});
-const clock=new THREE.Clock();
-let roundActive=false, roundTime=60, collected=0, roundInterval=null;
-const timerHud=document.getElementById('timerHud');
-const arenaCoins=document.getElementById('arenaCoins');
-const roundMessage=document.getElementById('roundMessage');
-function startRound(){
- roundActive=true;roundTime=60;collected=0;
- pickups.forEach(p=>{p.active=true;p.mesh.visible=true;});
- arenaCoins.textContent='0';timerHud.textContent='⏱️ 60';
- roundMessage.textContent='يلا اجمع العملات الذهبية! 🪙';
- if(roundInterval)clearInterval(roundInterval);
- roundInterval=setInterval(()=>{
-  if(!roundActive)return;
-  roundTime--;timerHud.textContent='⏱️ '+roundTime;
-  if(roundTime<=0){roundActive=false;clearInterval(roundInterval);roundMessage.textContent='انتهى الوقت! جمعت '+collected+' عملة 🎉';}
- },1000);
-}
-document.getElementById('startRound').onclick=startRound;
-document.getElementById('resetRound').onclick=()=>{if(roundInterval)clearInterval(roundInterval);startRound();player.position.set(0,.25,0);};
-window.addEventListener('keydown',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.left=true;if(['ArrowRight','d','D'].includes(e.key))keys.right=true;if(['ArrowUp','w','W',' '].includes(e.key)&&grounded){vy=7.2;grounded=false;}});
-window.addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.left=false;if(['ArrowRight','d','D'].includes(e.key))keys.right=false;});
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
- if(keys.left){player.position.x-=4*dt;player.rotation.y=-.35;}if(keys.right){player.position.x+=4*dt;player.rotation.y=.35;}
- player.position.x=THREE.MathUtils.clamp(player.position.x,-4.3,4.3);
- vy-=17*dt;player.position.y+=vy*dt;if(player.position.y<=.25){player.position.y=.25;vy=0;grounded=true;}
- player.position.z=Math.sin(clock.elapsedTime*2)*.08;
- player.rotation.y+=(turn-player.rotation.y)*.025;
- player.children[0].rotation.z=Math.sin(clock.elapsedTime*8)*.04;
- pickups.forEach(p=>{
-  if(!p.active)return;
-  p.mesh.rotation.z+=dt*2.4;p.mesh.rotation.y+=dt*1.5;
-  const dx=player.position.x-p.mesh.position.x,dz=player.position.z-p.mesh.position.z;
-  if(roundActive && Math.hypot(dx,dz)<.62 && player.position.y<1.15){
-   p.active=false;p.mesh.visible=false;collected++;arenaCoins.textContent=String(collected);
-   roundMessage.textContent='جميل! جمعت '+collected+' من 8 عملات ⭐';
-   if(collected===8){roundActive=false;if(roundInterval)clearInterval(roundInterval);roundMessage.textContent='أسطورة! جمعت كل العملات! 🏆';if(window.awardArenaCoins)window.awardArenaCoins(20);}
-  }
- });
- camera.position.x=Math.sin(turn)*2;camera.position.z=11*Math.cos(turn)+1;camera.lookAt(0,1,0);
- renderer.render(scene,camera);
-}
-animate();
-new ResizeObserver(()=>{const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);}).observe(stage);
-</script>
-
-<script>
-const tasks=["اتكلم بصوت مذيع أخبار لمدة 20 ثانية","قلّد صوت حيوان وخلي أصحابك يخمنوا","احكي موقف مضحك حصل لك","اعمل وش مضحك لمدة 10 ثواني","غنّي جملة من أغنية بصوت روبوت","امدح اللاعب اللي على يمينك بطريقة كوميدية","اتكلم من غير حرف الميم لمدة 15 ثانية","مثّل إنك بتكسب مليون جنيه"];
-let score=+(localStorage.fpScore||0),coins=+(localStorage.fpCoins||0),current="";const $=id=>document.getElementById(id);
-function render(){ $("score").textContent=score;$("coins").textContent=coins;localStorage.fpScore=score;localStorage.fpCoins=coins;}
-$("new").onclick=()=>{current=tasks[Math.floor(Math.random()*tasks.length)];$("challenge").textContent=current;};
-$("done").onclick=()=>{if(!current){$("challenge").textContent="اختار تحدي جديد الأول!";return;}score+=10;coins+=5;current="";$("challenge").textContent="برافو! كسبت 10 نقاط و5 عملات 🎉";render();};
-$("room").onclick=()=>{$("roomcode").textContent="كود الغرفة التجريبي: "+Math.random().toString(36).slice(2,7).toUpperCase();};
-render();
-window.awardArenaCoins=(amount)=>{coins+=amount;score+=amount*2;render();};
+function animate(){requestAnimationFrame(animate);let dt=Math.min(clock.getDelta(),.04);update(dt);renderer.render(scene,camera)}animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 </script>
 </body></html>
