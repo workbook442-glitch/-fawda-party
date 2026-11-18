@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>فوضى التحديات - مغامرة 3D V5</title>
+<title>فوضى التحديات - مغامرة 3D V6</title>
 <style>
 :root{--glass:rgba(13,22,39,.72);--line:rgba(255,255,255,.18)}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101d32;font-family:system-ui,Tahoma,Arial;color:#fff;touch-action:none}
@@ -20,6 +20,8 @@
 #jump{width:78px;height:78px;background:linear-gradient(145deg,#48d6c8,#1685d4)}
 #start{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:auto;border:0;border-radius:18px;padding:15px 28px;color:#fff;font-weight:900;font-size:18px;background:linear-gradient(120deg,#ff8a36,#e83f75);box-shadow:0 12px 35px #0008}
 #hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:10px;opacity:.75;white-space:nowrap}
+#cameraHint{position:absolute;right:18px;bottom:116px;padding:7px 11px;border-radius:14px;background:#101b3080;border:1px solid #ffffff35;font-size:11px;opacity:.78;pointer-events:none}
+#joystick{z-index:3} .actions{z-index:3} #cameraHint{z-index:2}
 @media(min-width:700px){#joystick{width:150px;height:150px}#stick{left:46px;top:46px}}
 </style>
 </head>
@@ -35,7 +37,8 @@
  <button id="start">ابدأ المغامرة 🎮</button>
  <div id="joystick"><div id="stick"></div></div>
  <div class="actions"><button class="action" id="jump">قفز</button><button class="action" id="run">جري</button></div>
- <div id="hint">تحكم انسيابي — تسارع تدريجي ودوران ناعم وكاميرا متابعة</div>
+ <div id="cameraHint">اسحب صباعك في يمين الشاشة لتحريك الكاميرا ↔</div>
+ <div id="hint">العصاية الشمال للحركة • اسحب اليمين للنظر حولك</div>
 </div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
@@ -106,7 +109,7 @@ for(let i=0;i<12;i++){let c=new THREE.Mesh(new THREE.TorusGeometry(.38,.12,10,24
 for(let z=-16;z>-48;z-=16){let a=box(.35,3,.35,mat(0x4d7bdb),-3.4,1.5,z);let b=box(.35,3,.35,mat(0x4d7bdb),3.4,1.5,z);box(6.8,.35,.35,mat(0xf4b942),0,3,z)}
 // movement state
 let active=false,remaining=60,collected=0,score=0,velocityY=0,onGround=true,move={x:0,y:0},running=false;
-let yaw=0;
+let yaw=0, cameraYaw=0, cameraPitch=0;
 const moveVelocity=new THREE.Vector3();
 const cameraLook=new THREE.Vector3(0,1.3,0);
 const cameraDesired=new THREE.Vector3();
@@ -117,16 +120,30 @@ joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(j
 joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)setJoy(e)});
 function resetJoy(){joyId=null;move={x:0,y:0};stick.style.transform='translate(0,0)'}
 joy.addEventListener('pointerup',resetJoy);joy.addEventListener('pointercancel',resetJoy);
+// Right-side drag controls the third-person camera independently of movement
+let cameraPointerId=null,lastCameraX=0,lastCameraY=0;
+renderer.domElement.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='mouse' && e.button!==0)return;
+ if(e.clientX < innerWidth*.42)return;
+ cameraPointerId=e.pointerId;lastCameraX=e.clientX;lastCameraY=e.clientY;
+ renderer.domElement.setPointerCapture(e.pointerId);
+});
+renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==cameraPointerId)return;
+ const dx=e.clientX-lastCameraX,dy=e.clientY-lastCameraY;lastCameraX=e.clientX;lastCameraY=e.clientY;
+ cameraYaw-=dx*.0065;cameraPitch=THREE.MathUtils.clamp(cameraPitch+dy*.004,-.28,.48);
+});
+function endCameraDrag(e){if(e.pointerId===cameraPointerId)cameraPointerId=null}
+renderer.domElement.addEventListener('pointerup',endCameraDrag);renderer.domElement.addEventListener('pointercancel',endCameraDrag);
 document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();if(active&&onGround){velocityY=8.5;onGround=false}});
 document.getElementById('run').addEventListener('pointerdown',()=>running=true);document.getElementById('run').addEventListener('pointerup',()=>running=false);document.getElementById('run').addEventListener('pointerleave',()=>running=false);
 addEventListener('keydown',e=>{if(e.key===' '&&onGround&&active){velocityY=8.5;onGround=false} if(e.key==='Shift')running=true});
 addEventListener('keyup',e=>{if(e.key==='Shift')running=false});
-document.getElementById('start').onclick=()=>{active=true;remaining=60;collected=0;score=0;moveVelocity.set(0,0,0);yaw=0;player.rotation.y=0;player.position.set(0,0,8);camera.position.set(0,5,16);cameraLook.set(0,1.3,7);document.getElementById('start').style.display='none';document.getElementById('message').textContent='انطلق! اجمع العملات وتجاوز العقبات';document.getElementById('coins').textContent='0';document.getElementById('score').textContent='0'};
+document.getElementById('start').onclick=()=>{active=true;remaining=60;collected=0;score=0;moveVelocity.set(0,0,0);yaw=0;cameraYaw=0;cameraPitch=0;player.rotation.y=0;player.position.set(0,0,8);camera.position.set(0,5,16);cameraLook.set(0,1.3,7);document.getElementById('start').style.display='none';document.getElementById('message').textContent='انطلق! اجمع العملات وتجاوز العقبات';document.getElementById('coins').textContent='0';document.getElementById('score').textContent='0'};
 function update(dt){
  if(active){remaining-=dt;if(remaining<=0){remaining=0;active=false;document.getElementById('start').textContent='العب مرة تانية 🔄';document.getElementById('start').style.display='block';document.getElementById('message').textContent=`انتهت المغامرة! جمعت ${collected} عملة`;}
  let forward=move.y,side=move.x;
  let inputPower=Math.min(1,Math.hypot(side,forward));
- let desiredYaw=inputPower>.06?Math.atan2(side,forward):yaw;
+ let desiredYaw=inputPower>.06?cameraYaw+Math.atan2(side,forward):yaw;
  // Smoothly turn toward the requested direction instead of snapping instantly
  if(inputPower>.06){let angleDelta=Math.atan2(Math.sin(desiredYaw-yaw),Math.cos(desiredYaw-yaw));yaw+=angleDelta*(1-Math.exp(-9*dt))}
  let topSpeed=(running?10.5:6.2)*inputPower;
@@ -152,12 +169,13 @@ function update(dt){
  tailGroup.rotation.x=Math.sin(clock.elapsedTime*4)*.12;
  torso.position.y=player.position.y>0?Math.sin(clock.elapsedTime*12)*.055:(moving?Math.abs(gait)*.055:Math.sin(clock.elapsedTime*2)*.012);
  // chase camera behind the character, smoothly following heading
- const behind=new THREE.Vector3(Math.sin(yaw)*7.2,4.6,Math.cos(yaw)*7.2);
+ const horizontalDistance=7.2*Math.cos(cameraPitch);
+ const behind=new THREE.Vector3(Math.sin(cameraYaw)*horizontalDistance,4.6+cameraPitch*5,Math.cos(cameraYaw)*horizontalDistance);
  cameraDesired.copy(player.position).add(behind);
  camera.position.x=THREE.MathUtils.damp(camera.position.x,cameraDesired.x,4.8,dt);
  camera.position.y=THREE.MathUtils.damp(camera.position.y,cameraDesired.y,4.8,dt);
  camera.position.z=THREE.MathUtils.damp(camera.position.z,cameraDesired.z,4.8,dt);
- const lookTarget=new THREE.Vector3(player.position.x+moveVelocity.x*.22,1.45+player.position.y,player.position.z+moveVelocity.z*.22-1.0);
+ const lookTarget=new THREE.Vector3(player.position.x-Math.sin(cameraYaw)*1.0,1.45+player.position.y,player.position.z-Math.cos(cameraYaw)*1.0);
  cameraLook.lerp(lookTarget,1-Math.exp(-7*dt));camera.lookAt(cameraLook);
  document.getElementById('time').textContent=Math.ceil(remaining);
 }
