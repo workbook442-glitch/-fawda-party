@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>فوضى التحديات - مغامرة 3D V7</title>
+<title>فوضى التحديات - مغامرة 3D V8</title>
 <style>
 :root{--glass:rgba(13,22,39,.72);--line:rgba(255,255,255,.18)}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101d32;font-family:system-ui,Tahoma,Arial;color:#fff;touch-action:none}
@@ -66,9 +66,10 @@ const flowerColors=[0xffe36e,0xff8fc1,0xffffff,0x9c8bff];
 for(let i=0;i<65;i++){let x=(Math.sin(i*13.1)*5.2)+(i%2?5.7:-5.7),z=-44+(i*1.47)%88;let stem=new THREE.Mesh(new THREE.CylinderGeometry(.025,.035,.28,6),mat(0x34884b));stem.position.set(x,.14,z);scene.add(stem);let bloom=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),mat(flowerColors[i%4]));bloom.position.set(x,.32,z);bloom.scale.y=.65;scene.add(bloom)}
 // decorative rocks and stepping platforms
 for(let i=0;i<16;i++){let x=(Math.sin(i*8.1)*1.8)+(i%2?3.5:-3.5),z=-35+i*4.5;let r=new THREE.Mesh(new THREE.DodecahedronGeometry(.65+(i%3)*.18),rock);r.position.set(x,.45,z);r.scale.y=.7;r.castShadow=true;scene.add(r)}
-// polished cartoon fox adventurer with expressive face, outfit and articulated limbs
+// V8: enhanced stylized fox adventurer with layered outfit, expressive face and detailed paws
 const player=new THREE.Group();scene.add(player);
 const orange=mat(0xf47d32,.58),orangeLight=mat(0xffa34e,.58),cream=mat(0xffe8c9,.78),dark=mat(0x30263a,.48),eye=mat(0x171923,.2),white=mat(0xffffff,.2),red=mat(0xe84d59,.55),blue=mat(0x2876b9,.5);
+const jacket=mat(0x246da7,.52),jacketLight=mat(0x48a4d8,.48),goldTrim=mat(0xffcf62,.38,.22),pink=mat(0xff9b9f,.65),brown=mat(0x8b4528,.7);
 function sph(parent,geo,material,x,y,z,sx=1,sy=1,sz=1){let o=new THREE.Mesh(geo,material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
 function limb(parent,x,y,z,material,r=.14,len=.48){let pivot=new THREE.Group();pivot.position.set(x,y,z);parent.add(pivot);let part=new THREE.Mesh(new THREE.CapsuleGeometry(r,len,5,10),material);part.position.y=-len*.42;part.castShadow=true;pivot.add(part);return pivot}
 const torso=new THREE.Group();player.add(torso);
@@ -77,32 +78,63 @@ sph(torso,new THREE.SphereGeometry(.34,24,18),cream,0,1.02,.48,.9,.9,.24);
 sph(torso,new THREE.SphereGeometry(.5,32,24),orangeLight,0,1.94,-.02,1,.91,.88);
 sph(torso,new THREE.SphereGeometry(.32,24,18),cream,0,1.78,.39,1,.67,.55);
 // pointed fox ears with inner peach details
+const eyeWhites=[];
 for(const side of [-1,1]){
  let ear=sph(torso,new THREE.ConeGeometry(.23,.68,16),orange,side*.32,2.55,-.04,1,1,1);ear.rotation.z=side*-.2;
  let inner=sph(torso,new THREE.ConeGeometry(.105,.39,12),red,side*.32,2.55,.105,1,1,1);inner.rotation.z=side*-.2;
- sph(torso,new THREE.SphereGeometry(.105,16,12),white,side*.19,2.02,.78,.95,1,.45);
+ const eyeWhite=sph(torso,new THREE.SphereGeometry(.105,16,12),white,side*.19,2.02,.78,.95,1,.45);eyeWhites.push(eyeWhite);
  sph(torso,new THREE.SphereGeometry(.073,16,12),eye,side*.19,2.02,.84,.9,1,.45);
  sph(torso,new THREE.SphereGeometry(.026,10,8),white,side*.215,2.055,.875,1,1,.5);
+ // expressive raised eyebrows and warm cheek spots
+ let brow=sph(torso,new THREE.CapsuleGeometry(.025,.14,4,8),brown,side*.19,2.18,.79);brow.rotation.z=side*-.18;
+ sph(torso,new THREE.SphereGeometry(.075,14,10),pink,side*.34,1.79,.72,1.25,.62,.35);
+ for(let k=0;k<3;k++)sph(torso,new THREE.SphereGeometry(.018,8,6),brown,side*(.29+k*.045),1.78+(k%2)*.035,.755,1,1,.5);
 }
 // muzzle and nose
 sph(torso,new THREE.SphereGeometry(.22,20,16),cream,0,1.72,.78,1.25,.72,.75);
 sph(torso,new THREE.SphereGeometry(.075,16,12),dark,0,1.81,.96,1, .8,.7);
 // little smile
 const smile=new THREE.Mesh(new THREE.TorusGeometry(.095,.018,6,16,Math.PI),dark);smile.position.set(0,1.62,.96);smile.rotation.set(Math.PI,0,0);torso.add(smile);
+// tailored explorer jacket layered over the belly, with piping and utility details
+sph(torso,new THREE.SphereGeometry(.48,28,20),jacket,0,1.12,-.015,.92,.92,.78);
+sph(torso,new THREE.SphereGeometry(.25,22,16),cream,0,1.12,.49,.95,.85,.22);
+sph(torso,new THREE.BoxGeometry(.055,.72,.045),goldTrim,0,1.12,.515);
+for(const side of [-1,1]){
+ sph(torso,new THREE.SphereGeometry(.075,12,10),goldTrim,side*.29,1.31,.49,1,.7,.35);
+ sph(torso,new THREE.SphereGeometry(.055,12,10),goldTrim,side*.29,.96,.49,1,.7,.35);
+}
 // scarf, backpack and straps
 const scarf=sph(torso,new THREE.TorusGeometry(.43,.105,10,32),red,0,1.52,-.02,1,1,.8);scarf.rotation.x=Math.PI/2;
 const scarfTail=sph(torso,new THREE.CapsuleGeometry(.09,.38,4,8),red,-.34,1.28,-.35,.8,1,.7);scarfTail.rotation.z=-.48;
 const pack=sph(torso,new THREE.BoxGeometry(.48,.58,.28),blue,0,1.18,-.58,1,1,1);
 for(const side of [-1,1]){let strap=sph(torso,new THREE.CapsuleGeometry(.045,.46,4,8),red,side*.37,1.42,-.22);strap.rotation.z=side*.3}
+// waist belt, buckle and small side pouch
+const belt=sph(torso,new THREE.TorusGeometry(.39,.055,8,28),brown,0,.72,0,1,1,.82);belt.rotation.x=Math.PI/2;
+sph(torso,new THREE.BoxGeometry(.19,.16,.07),goldTrim,0,.72,.39);
+sph(torso,new THREE.BoxGeometry(.19,.23,.18),red,.43,.82,-.02);
 // articulated arms and legs
 const arms=[limb(torso,-.55,1.45,0,orange,.14,.48),limb(torso,.55,1.45,0,orange,.14,.48)];
 const legs=[limb(player,-.25,.53,0,dark,.16,.48),limb(player,.25,.53,0,dark,.16,.48)];
 // Feet and hands are attached to their joints so they follow every step and arm swing
 const feet=legs.map((leg)=>sph(leg,new THREE.SphereGeometry(.19,18,14),dark,0,-.43,.12,1,.62,1.35));
-const hands=arms.map((arm)=>sph(arm,new THREE.SphereGeometry(.145,16,12),cream,0,-.48,.015,1,1,1));
+const hands=arms.map((arm)=>{
+ const palm=sph(arm,new THREE.SphereGeometry(.145,18,14),cream,0,-.48,.015,1,1,1);
+ // three tiny rounded fingers and a thumb make the paws read clearly
+ for(let f=-1;f<=1;f++)sph(arm,new THREE.SphereGeometry(.045,10,8),cream,f*.075,-.575,.085,1,1.15,1);
+ sph(arm,new THREE.SphereGeometry(.052,10,8),cream,.115,-.49,.045,1,1,1);
+ return palm;
+});
+// polished explorer boots with bright cuffs and toe caps
+for(let i=0;i<2;i++){
+ sph(legs[i],new THREE.CylinderGeometry(.17,.18,.12,16),jacketLight,0,-.28,.015,1,1,1);
+ sph(legs[i],new THREE.SphereGeometry(.13,14,10),goldTrim,0,-.44,.20,1,.55,.45);
+}
 const tailGroup=new THREE.Group();tailGroup.position.set(0,.88,-.48);player.add(tailGroup);
 let tail=sph(tailGroup,new THREE.ConeGeometry(.34,1.05,20),orange,0,0,-.42);tail.rotation.x=-.9;
 sph(tailGroup,new THREE.SphereGeometry(.25,18,14),cream,0,-.34,-.78,1,1.1,1);
+// soft layered tail tufts give the silhouette a fuller animated finish
+sph(tailGroup,new THREE.SphereGeometry(.23,16,12),orangeLight,-.16,-.16,-.38,1,.8,1.1);
+sph(tailGroup,new THREE.SphereGeometry(.22,16,12),orange,.16,-.16,-.40,1,.8,1.1);
 player.position.set(0,0,8);
 // coin line with varied positions
 const coins=[];
@@ -112,7 +144,7 @@ for(let z=-16;z>-48;z-=16){let a=box(.35,3,.35,mat(0x4d7bdb),-3.4,1.5,z);let b=b
 // movement state
 let active=false,remaining=60,collected=0,score=0,velocityY=0,onGround=true,move={x:0,y:0},running=false;
 let yaw=0, cameraYaw=0, cameraPitch=0;
-let gaitPhase=0, landingKick=0, previousY=0, lastVX=0, lastVZ=0;
+let gaitPhase=0, landingKick=0, previousY=0, lastVX=0, lastVZ=0, blinkClock=0, blinkValue=0;
 const moveVelocity=new THREE.Vector3();
 const cameraLook=new THREE.Vector3(0,1.3,0);
 const cameraDesired=new THREE.Vector3();
@@ -196,6 +228,11 @@ function update(dt){
  torso.rotation.x=THREE.MathUtils.damp(torso.rotation.x,air?-.16:THREE.MathUtils.clamp(-accelZ*.018,-.18,.2),9,dt);
  torso.rotation.z=THREE.MathUtils.damp(torso.rotation.z,THREE.MathUtils.clamp(-accelX*.018,-.18,.18),8,dt);
  torso.position.x=THREE.MathUtils.damp(torso.position.x,Math.sin(gaitPhase*.5)*.035*walkAmount,8,dt);
+ // natural occasional blink; eyes briefly narrow then reopen
+ blinkClock+=dt;
+ if(blinkClock>3.1+Math.sin(clock.elapsedTime*.37)*1.15){blinkValue=Math.min(1,blinkValue+dt*13);if(blinkValue>=1)blinkClock=0;}
+ if(blinkValue>0){blinkValue=Math.max(0,blinkValue-dt*9);}
+ for(const e of eyeWhites)e.scale.y=.45*(1-.88*blinkValue);
  const breathe=Math.sin(clock.elapsedTime*2.1)*.012;
  const runBob=air?0:(moving?Math.abs(Math.sin(gaitPhase*2))*.045*walkAmount:0);
  torso.position.y=(air?0:runBob+breathe)-landingKick*.10;
