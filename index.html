@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>فوضى التحديات - مغامرة 3D</title>
+<title>فوضى التحديات - مغامرة 3D V4</title>
 <style>
 :root{--glass:rgba(13,22,39,.72);--line:rgba(255,255,255,.18)}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101d32;font-family:system-ui,Tahoma,Arial;color:#fff;touch-action:none}
@@ -31,40 +31,73 @@
   <div class="panel stat">🏆 <span id="score">0</span><small>النقاط</small></div>
   <div class="panel stat">⏱️ <span id="time">60</span><small>الوقت</small></div>
  </div>
- <div id="message">استكشف الساحة واجمع العملات!</div>
+ <div id="message">مغامرة الغابة — اجمع العملات واكتشف الطريق!</div>
  <button id="start">ابدأ المغامرة 🎮</button>
  <div id="joystick"><div id="stick"></div></div>
  <div class="actions"><button class="action" id="jump">قفز</button><button class="action" id="run">جري</button></div>
- <div id="hint">حرّك العصا في أي اتجاه — الكاميرا تتبعك من الخلف</div>
+ <div id="hint">عالم كرتوني مطوّر — تحكم كامل من الموبايل</div>
 </div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const root=document.getElementById('game');
 const scene=new THREE.Scene(); scene.background=new THREE.Color(0x8ed8ff); scene.fog=new THREE.Fog(0x8ed8ff,28,90);
 const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,150);
-const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap; renderer.outputColorSpace=THREE.SRGBColorSpace; root.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xeaf8ff,0x6d7f53,2.0));
-const sun=new THREE.DirectionalLight(0xfff2d5,2.4); sun.position.set(-12,22,10); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
+const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap; renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.12; root.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xeaf8ff,0x71865d,2.25));
+const sun=new THREE.DirectionalLight(0xfff2d5,2.4); sun.position.set(-12,25,10); sun.castShadow=true; sun.shadow.bias=-0.00025; sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
 const mat=(c,r=.8,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
-const grass=mat(0x5ebd68), path=mat(0xd8bd86), rock=mat(0x7f91a5), wood=mat(0x80502f), leaf=mat(0x248b58), gold=new THREE.MeshStandardMaterial({color:0xffc928,metalness:.65,roughness:.25,emissive:0x684300});
+const grass=mat(0x4fae61), path=mat(0xd9bd8d), rock=mat(0x8495a8), wood=mat(0x80502f), leaf=mat(0x248b58), gold=new THREE.MeshStandardMaterial({color:0xffc928,metalness:.65,roughness:.25,emissive:0x684300});
 const floor=new THREE.Mesh(new THREE.PlaneGeometry(100,100),grass);floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
 const trail=new THREE.Mesh(new THREE.PlaneGeometry(7,100),path);trail.rotation.x=-Math.PI/2;trail.position.set(0,.012,0);trail.receiveShadow=true;scene.add(trail);
+const pathEdge=mat(0xb49a70);
+for(const x of [-3.65,3.65]){const edge=new THREE.Mesh(new THREE.BoxGeometry(.18,.08,100),pathEdge);edge.position.set(x,.06,0);edge.receiveShadow=true;scene.add(edge)}
+// distant rounded hills frame the adventure valley
+for(let i=0;i<18;i++){const h=new THREE.Mesh(new THREE.IcosahedronGeometry(5+(i%4)*1.4,2),mat([0x68b77a,0x7fc77d,0x72b7a0][i%3]));h.position.set((i%2?1:-1)*(17+(i%3)*4),-1.5,-45+i*6);h.scale.y=.7;h.receiveShadow=true;scene.add(h)}
+// soft stylized clouds
+const cloudMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1});
+for(let i=0;i<9;i++){const cloud=new THREE.Group();for(let j=0;j<4;j++){const puff=new THREE.Mesh(new THREE.SphereGeometry(1.15-(j%2)*.2,16,12),cloudMat);puff.position.set((j-1.5)*.85,Math.sin(j)*.18,0);cloud.add(puff)}cloud.position.set(Math.sin(i*5)*22,12+(i%3)*3,-38+i*11);cloud.scale.setScalar(.8+(i%3)*.18);scene.add(cloud)}
 function box(w,h,d,material,x,y,z){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
-function tree(x,z,s=1){let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22*s,.32*s,2*s,8),wood);trunk.position.set(x,s,z);trunk.castShadow=true;scene.add(trunk);let crown=new THREE.Mesh(new THREE.IcosahedronGeometry(1.25*s,1),leaf);crown.position.set(x,2.5*s,z);crown.castShadow=true;scene.add(crown);let crown2=new THREE.Mesh(new THREE.IcosahedronGeometry(.8*s,1),mat(0x39aa65));crown2.position.set(x+.45*s,2.9*s,z-.2*s);scene.add(crown2)}
+function tree(x,z,s=1){let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.2*s,.31*s,2.1*s,10),wood);trunk.position.set(x,1.05*s,z);trunk.castShadow=true;scene.add(trunk);for(let k=0;k<3;k++){let crown=new THREE.Mesh(new THREE.IcosahedronGeometry((1.05-k*.12)*s,2),mat([0x23884f,0x2e9b58,0x43ad65][k]));crown.position.set(x+(k-1)*.34*s,2.35*s+k*.45*s,z+(k%2)*.22*s);crown.castShadow=true;scene.add(crown)}}
 for(let z=-42;z<48;z+=9){tree(-7-(Math.sin(z)*1.5),z,.8+Math.abs(Math.sin(z))*.25);tree(7+(Math.cos(z)*1.5),z,.85+Math.abs(Math.cos(z))*.2)}
+const flowerColors=[0xffe36e,0xff8fc1,0xffffff,0x9c8bff];
+for(let i=0;i<65;i++){let x=(Math.sin(i*13.1)*5.2)+(i%2?5.7:-5.7),z=-44+(i*1.47)%88;let stem=new THREE.Mesh(new THREE.CylinderGeometry(.025,.035,.28,6),mat(0x34884b));stem.position.set(x,.14,z);scene.add(stem);let bloom=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),mat(flowerColors[i%4]));bloom.position.set(x,.32,z);bloom.scale.y=.65;scene.add(bloom)}
 // decorative rocks and stepping platforms
 for(let i=0;i<16;i++){let x=(Math.sin(i*8.1)*1.8)+(i%2?3.5:-3.5),z=-35+i*4.5;let r=new THREE.Mesh(new THREE.DodecahedronGeometry(.65+(i%3)*.18),rock);r.position.set(x,.45,z);r.scale.y=.7;r.castShadow=true;scene.add(r)}
-// animal adventurer: cute fox-like character
+// polished cartoon fox adventurer with expressive face, outfit and articulated limbs
 const player=new THREE.Group();scene.add(player);
-const orange=mat(0xf28b35),cream=mat(0xffe3b8),dark=mat(0x392b38),eye=mat(0x171923,.3);
-function sph(parent,geo,material,x,y,z,sx=1,sy=1,sz=1){let o=new THREE.Mesh(geo,material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;parent.add(o);return o}
-sph(player,new THREE.SphereGeometry(.55,24,18),orange,0,1.05,0, .82,1.05,.68);
-sph(player,new THREE.SphereGeometry(.48,24,18),orange,0,1.85,-.03,1, .9,.9);
-sph(player,new THREE.SphereGeometry(.29,20,16),cream,0,1.67,.37,1,.65,.45);
-sph(player,new THREE.SphereGeometry(.09,16,12),dark,0,1.78,.72,1,1,.7);
-for(let side of [-1,1]){sph(player,new THREE.ConeGeometry(.2,.55,12),orange,side*.31,2.35,-.05,1,1,1).rotation.z=side*-.22;sph(player,new THREE.SphereGeometry(.075,12,10),eye,side*.19,1.96,.72,.8,1,.5)}
-const tail=sph(player,new THREE.ConeGeometry(.28,.9,16),orange,0,.85,-.72);tail.rotation.x=-1.0;
-for(let side of [-1,1]){let leg=sph(player,new THREE.CapsuleGeometry(.13,.42,4,8),dark,side*.25,.35,0);leg.rotation.x=.12}
+const orange=mat(0xf47d32,.58),orangeLight=mat(0xffa34e,.58),cream=mat(0xffe8c9,.78),dark=mat(0x30263a,.48),eye=mat(0x171923,.2),white=mat(0xffffff,.2),red=mat(0xe84d59,.55),blue=mat(0x2876b9,.5);
+function sph(parent,geo,material,x,y,z,sx=1,sy=1,sz=1){let o=new THREE.Mesh(geo,material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function limb(parent,x,y,z,material,r=.14,len=.48){let pivot=new THREE.Group();pivot.position.set(x,y,z);parent.add(pivot);let part=new THREE.Mesh(new THREE.CapsuleGeometry(r,len,5,10),material);part.position.y=-len*.42;part.castShadow=true;pivot.add(part);return pivot}
+const torso=new THREE.Group();player.add(torso);
+sph(torso,new THREE.SphereGeometry(.57,32,24),orange,0,1.08,0,.86,1.05,.72);
+sph(torso,new THREE.SphereGeometry(.34,24,18),cream,0,1.02,.48,.9,.9,.24);
+sph(torso,new THREE.SphereGeometry(.5,32,24),orangeLight,0,1.94,-.02,1,.91,.88);
+sph(torso,new THREE.SphereGeometry(.32,24,18),cream,0,1.78,.39,1,.67,.55);
+// pointed fox ears with inner peach details
+for(const side of [-1,1]){
+ let ear=sph(torso,new THREE.ConeGeometry(.23,.68,16),orange,side*.32,2.55,-.04,1,1,1);ear.rotation.z=side*-.2;
+ let inner=sph(torso,new THREE.ConeGeometry(.105,.39,12),red,side*.32,2.55,.105,1,1,1);inner.rotation.z=side*-.2;
+ sph(torso,new THREE.SphereGeometry(.105,16,12),white,side*.19,2.02,.78,.95,1,.45);
+ sph(torso,new THREE.SphereGeometry(.073,16,12),eye,side*.19,2.02,.84,.9,1,.45);
+ sph(torso,new THREE.SphereGeometry(.026,10,8),white,side*.215,2.055,.875,1,1,.5);
+}
+// muzzle and nose
+sph(torso,new THREE.SphereGeometry(.22,20,16),cream,0,1.72,.78,1.25,.72,.75);
+sph(torso,new THREE.SphereGeometry(.075,16,12),dark,0,1.81,.96,1, .8,.7);
+// little smile
+const smile=new THREE.Mesh(new THREE.TorusGeometry(.095,.018,6,16,Math.PI),dark);smile.position.set(0,1.62,.96);smile.rotation.set(Math.PI,0,0);torso.add(smile);
+// scarf, backpack and straps
+const scarf=sph(torso,new THREE.TorusGeometry(.43,.105,10,32),red,0,1.52,-.02,1,1,.8);scarf.rotation.x=Math.PI/2;
+const scarfTail=sph(torso,new THREE.CapsuleGeometry(.09,.38,4,8),red,-.34,1.28,-.35,.8,1,.7);scarfTail.rotation.z=-.48;
+const pack=sph(torso,new THREE.BoxGeometry(.48,.58,.28),blue,0,1.18,-.58,1,1,1);
+for(const side of [-1,1]){let strap=sph(torso,new THREE.CapsuleGeometry(.045,.46,4,8),red,side*.37,1.42,-.22);strap.rotation.z=side*.3}
+// articulated arms and legs
+const arms=[limb(torso,-.55,1.45,0,orange,.14,.48),limb(torso,.55,1.45,0,orange,.14,.48)];
+const legs=[limb(player,-.25,.53,0,dark,.16,.48),limb(player,.25,.53,0,dark,.16,.48)];
+for(const side of [-1,1])sph(player,new THREE.SphereGeometry(.18,16,12),dark,side*.25,.12,.05,1,.55,1);
+const tailGroup=new THREE.Group();tailGroup.position.set(0,.88,-.48);player.add(tailGroup);
+let tail=sph(tailGroup,new THREE.ConeGeometry(.34,1.05,20),orange,0,0,-.42);tail.rotation.x=-.9;
+sph(tailGroup,new THREE.SphereGeometry(.25,18,14),cream,0,-.34,-.78,1,1.1,1);
 player.position.set(0,0,8);
 // coin line with varied positions
 const coins=[];
@@ -93,6 +126,13 @@ function update(dt){
  for(let c of coins){if(c.visible&&player.position.distanceTo(c.position)<1.35){c.visible=false;collected++;score+=100;document.getElementById('coins').textContent=collected;document.getElementById('score').textContent=score;document.getElementById('message').textContent='عملة جديدة! ممتاز 🪙'}}
  }
  for(let c of coins){if(c.visible){c.rotation.y+=dt*2.2;c.position.y=1.25+Math.sin(clock.elapsedTime*2+c.position.z)*.16}}
+ // lively walk/run cycle and scarf/tail motion
+ const moving=active&&Math.hypot(move.x,move.y)>.08;
+ const gait=moving?Math.sin(clock.elapsedTime*(running?13:8)):0;
+ legs[0].rotation.x=gait*.62; legs[1].rotation.x=-gait*.62;
+ arms[0].rotation.x=-gait*.48; arms[1].rotation.x=gait*.48;
+ tailGroup.rotation.x=Math.sin(clock.elapsedTime*4)*.12;
+ torso.position.y=moving?Math.abs(gait)*.045:Math.sin(clock.elapsedTime*2)*.012;
  // chase camera behind the character, smoothly following heading
  const behind=new THREE.Vector3(Math.sin(yaw)*8,5.2,Math.cos(yaw)*8);
  const targetCam=player.position.clone().add(behind);camera.position.lerp(targetCam,1-Math.pow(.001,dt));camera.lookAt(player.position.x,1.25,player.position.z-1.2);
