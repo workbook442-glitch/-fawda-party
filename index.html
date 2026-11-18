@@ -1,257 +1,48 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>فوضى التحديات - مغامرة 3D V8</title>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>فوضى التحديات - مغامرة 3D V9</title>
 <style>
-:root{--glass:rgba(13,22,39,.72);--line:rgba(255,255,255,.18)}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101d32;font-family:system-ui,Tahoma,Arial;color:#fff;touch-action:none}
-#game{position:fixed;inset:0}canvas{display:block}
-#hud{position:fixed;inset:0;pointer-events:none}
-.top{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
-.panel{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:9px 13px;backdrop-filter:blur(10px);box-shadow:0 8px 28px #0004}
-.stat{font-weight:800;font-size:14px}.stat small{display:block;font-size:10px;opacity:.72;font-weight:600}
-#message{position:absolute;top:86px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#101b30c9;padding:9px 16px;border:1px solid var(--line);border-radius:20px;font-size:13px}
-#joystick{position:absolute;bottom:24px;left:22px;width:138px;height:138px;border-radius:50%;background:#ffffff20;border:2px solid #ffffff4a;pointer-events:auto;touch-action:none;box-shadow:inset 0 0 20px #0003}
-#stick{position:absolute;left:40px;top:40px;width:54px;height:54px;border-radius:50%;background:linear-gradient(145deg,#fff,#a9c9ff);box-shadow:0 5px 16px #0007;border:2px solid #fff}
-.actions{position:absolute;bottom:28px;right:20px;display:flex;gap:12px;align-items:flex-end;pointer-events:auto}
-.action{transition:transform .08s ease,filter .08s ease}.action:active{transform:scale(.93);filter:brightness(1.15)}.action{border:2px solid #ffffff80;border-radius:50%;width:68px;height:68px;color:white;font-weight:900;font-size:13px;background:linear-gradient(145deg,#ff9e38,#ed4d64);box-shadow:0 7px 18px #0006;touch-action:none}
-#jump{width:78px;height:78px;background:linear-gradient(145deg,#48d6c8,#1685d4)}
-#start{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:auto;border:0;border-radius:18px;padding:15px 28px;color:#fff;font-weight:900;font-size:18px;background:linear-gradient(120deg,#ff8a36,#e83f75);box-shadow:0 12px 35px #0008}
-#hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:10px;opacity:.75;white-space:nowrap}
-#cameraHint{position:absolute;right:18px;bottom:116px;padding:7px 11px;border-radius:14px;background:#101b3080;border:1px solid #ffffff35;font-size:11px;opacity:.78;pointer-events:none}
-#joystick{z-index:3} .actions{z-index:3} #cameraHint{z-index:2}
-@media(min-width:700px){#joystick{width:150px;height:150px}#stick{left:46px;top:46px}}
-</style>
-</head>
-<body>
-<div id="game"></div>
-<div id="hud">
- <div class="top">
-  <div class="panel stat">🪙 <span id="coins">0</span><small>العملات</small></div>
-  <div class="panel stat">🏆 <span id="score">0</span><small>النقاط</small></div>
-  <div class="panel stat">⏱️ <span id="time">60</span><small>الوقت</small></div>
- </div>
- <div id="message">مغامرة الغابة — اجمع العملات واكتشف الطريق!</div>
- <button id="start">ابدأ المغامرة 🎮</button>
- <div id="joystick"><div id="stick"></div></div>
- <div class="actions"><button class="action" id="jump">قفز</button><button class="action" id="run">جري</button></div>
- <div id="cameraHint">اسحب صباعك في يمين الشاشة لتحريك الكاميرا ↔</div>
- <div id="hint">العصاية الشمال للحركة • اسحب اليمين للنظر حولك</div>
-</div>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#8ed8ff;color:#fff;font-family:system-ui,Tahoma,Arial;touch-action:none}#game{position:fixed;inset:0}canvas{display:block}#hud{position:fixed;inset:0;pointer-events:none}.top{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:7px}.panel{background:#101b30c9;border:1px solid #ffffff40;border-radius:15px;padding:8px 12px;backdrop-filter:blur(8px);font-weight:900;font-size:14px}.panel small{display:block;font-size:10px;opacity:.75}#message{position:absolute;top:75px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#101b30c9;border:1px solid #ffffff40;border-radius:20px;padding:9px 14px;font-size:12px}#joystick{position:absolute;bottom:23px;left:20px;width:138px;height:138px;border-radius:50%;background:#ffffff25;border:2px solid #ffffff65;pointer-events:auto;touch-action:none}#stick{position:absolute;left:40px;top:40px;width:54px;height:54px;border-radius:50%;background:linear-gradient(145deg,#fff,#9dc7ff);box-shadow:0 5px 16px #0007;border:2px solid white}.actions{position:absolute;bottom:28px;right:18px;display:flex;gap:10px;pointer-events:auto}.action{border:2px solid #ffffff90;border-radius:50%;width:68px;height:68px;color:white;font-weight:900;background:linear-gradient(145deg,#ff9e38,#ed4d64);box-shadow:0 7px 18px #0006;touch-action:none}#jump{width:78px;height:78px;background:linear-gradient(145deg,#48d6c8,#1685d4)}#start{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:auto;border:0;border-radius:18px;padding:15px 25px;color:white;font-weight:900;font-size:18px;background:linear-gradient(120deg,#ff8a36,#e83f75);box-shadow:0 12px 35px #0008}#hint{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);font-size:10px;white-space:nowrap;text-shadow:0 2px 5px #000}@media(max-width:380px){.panel{font-size:12px;padding:7px 9px}#message{font-size:10px}}
+</style></head><body><div id="game"></div><div id="hud"><div class="top"><div class="panel">🪙 <span id="coins">0</span><small>العملات</small></div><div class="panel">🏆 <span id="score">0</span><small>النقاط</small></div><div class="panel">⏱️ <span id="time">75</span><small>الوقت</small></div></div><div id="message">V9 — اقفز فوق العوائق واجمع العملات!</div><button id="start">ابدأ المغامرة 🎮</button><div id="joystick"><div id="stick"></div></div><div class="actions"><button class="action" id="jump">قفز</button><button class="action" id="run">جري</button></div><div id="hint">العصاية الشمال للحركة • اسحب يمين الشاشة لتحريك الكاميرا</div></div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-const root=document.getElementById('game');
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x8ed8ff); scene.fog=new THREE.Fog(0x8ed8ff,28,90);
-const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,150);
-const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap; renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.12; root.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xeaf8ff,0x71865d,2.25));
-const sun=new THREE.DirectionalLight(0xfff2d5,2.4); sun.position.set(-12,25,10); sun.castShadow=true; sun.shadow.bias=-0.00025; sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
-const mat=(c,r=.8,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
-const grass=mat(0x4fae61), path=mat(0xd9bd8d), rock=mat(0x8495a8), wood=mat(0x80502f), leaf=mat(0x248b58), gold=new THREE.MeshStandardMaterial({color:0xffc928,metalness:.65,roughness:.25,emissive:0x684300});
-const floor=new THREE.Mesh(new THREE.PlaneGeometry(100,100),grass);floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
-const trail=new THREE.Mesh(new THREE.PlaneGeometry(7,100),path);trail.rotation.x=-Math.PI/2;trail.position.set(0,.012,0);trail.receiveShadow=true;scene.add(trail);
-const pathEdge=mat(0xb49a70);
-for(const x of [-3.65,3.65]){const edge=new THREE.Mesh(new THREE.BoxGeometry(.18,.08,100),pathEdge);edge.position.set(x,.06,0);edge.receiveShadow=true;scene.add(edge)}
-// distant rounded hills frame the adventure valley
-for(let i=0;i<18;i++){const h=new THREE.Mesh(new THREE.IcosahedronGeometry(5+(i%4)*1.4,2),mat([0x68b77a,0x7fc77d,0x72b7a0][i%3]));h.position.set((i%2?1:-1)*(17+(i%3)*4),-1.5,-45+i*6);h.scale.y=.7;h.receiveShadow=true;scene.add(h)}
-// soft stylized clouds
-const cloudMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1});
-for(let i=0;i<9;i++){const cloud=new THREE.Group();for(let j=0;j<4;j++){const puff=new THREE.Mesh(new THREE.SphereGeometry(1.15-(j%2)*.2,16,12),cloudMat);puff.position.set((j-1.5)*.85,Math.sin(j)*.18,0);cloud.add(puff)}cloud.position.set(Math.sin(i*5)*22,12+(i%3)*3,-38+i*11);cloud.scale.setScalar(.8+(i%3)*.18);scene.add(cloud)}
-function box(w,h,d,material,x,y,z){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
-function tree(x,z,s=1){let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.2*s,.31*s,2.1*s,10),wood);trunk.position.set(x,1.05*s,z);trunk.castShadow=true;scene.add(trunk);for(let k=0;k<3;k++){let crown=new THREE.Mesh(new THREE.IcosahedronGeometry((1.05-k*.12)*s,2),mat([0x23884f,0x2e9b58,0x43ad65][k]));crown.position.set(x+(k-1)*.34*s,2.35*s+k*.45*s,z+(k%2)*.22*s);crown.castShadow=true;scene.add(crown)}}
-for(let z=-42;z<48;z+=9){tree(-7-(Math.sin(z)*1.5),z,.8+Math.abs(Math.sin(z))*.25);tree(7+(Math.cos(z)*1.5),z,.85+Math.abs(Math.cos(z))*.2)}
-const flowerColors=[0xffe36e,0xff8fc1,0xffffff,0x9c8bff];
-for(let i=0;i<65;i++){let x=(Math.sin(i*13.1)*5.2)+(i%2?5.7:-5.7),z=-44+(i*1.47)%88;let stem=new THREE.Mesh(new THREE.CylinderGeometry(.025,.035,.28,6),mat(0x34884b));stem.position.set(x,.14,z);scene.add(stem);let bloom=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),mat(flowerColors[i%4]));bloom.position.set(x,.32,z);bloom.scale.y=.65;scene.add(bloom)}
-// decorative rocks and stepping platforms
-for(let i=0;i<16;i++){let x=(Math.sin(i*8.1)*1.8)+(i%2?3.5:-3.5),z=-35+i*4.5;let r=new THREE.Mesh(new THREE.DodecahedronGeometry(.65+(i%3)*.18),rock);r.position.set(x,.45,z);r.scale.y=.7;r.castShadow=true;scene.add(r)}
-// V8: enhanced stylized fox adventurer with layered outfit, expressive face and detailed paws
-const player=new THREE.Group();scene.add(player);
-const orange=mat(0xf47d32,.58),orangeLight=mat(0xffa34e,.58),cream=mat(0xffe8c9,.78),dark=mat(0x30263a,.48),eye=mat(0x171923,.2),white=mat(0xffffff,.2),red=mat(0xe84d59,.55),blue=mat(0x2876b9,.5);
-const jacket=mat(0x246da7,.52),jacketLight=mat(0x48a4d8,.48),goldTrim=mat(0xffcf62,.38,.22),pink=mat(0xff9b9f,.65),brown=mat(0x8b4528,.7);
-function sph(parent,geo,material,x,y,z,sx=1,sy=1,sz=1){let o=new THREE.Mesh(geo,material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
-function limb(parent,x,y,z,material,r=.14,len=.48){let pivot=new THREE.Group();pivot.position.set(x,y,z);parent.add(pivot);let part=new THREE.Mesh(new THREE.CapsuleGeometry(r,len,5,10),material);part.position.y=-len*.42;part.castShadow=true;pivot.add(part);return pivot}
-const torso=new THREE.Group();player.add(torso);
-sph(torso,new THREE.SphereGeometry(.57,32,24),orange,0,1.08,0,.86,1.05,.72);
-sph(torso,new THREE.SphereGeometry(.34,24,18),cream,0,1.02,.48,.9,.9,.24);
-sph(torso,new THREE.SphereGeometry(.5,32,24),orangeLight,0,1.94,-.02,1,.91,.88);
-sph(torso,new THREE.SphereGeometry(.32,24,18),cream,0,1.78,.39,1,.67,.55);
-// pointed fox ears with inner peach details
-const eyeWhites=[];
-for(const side of [-1,1]){
- let ear=sph(torso,new THREE.ConeGeometry(.23,.68,16),orange,side*.32,2.55,-.04,1,1,1);ear.rotation.z=side*-.2;
- let inner=sph(torso,new THREE.ConeGeometry(.105,.39,12),red,side*.32,2.55,.105,1,1,1);inner.rotation.z=side*-.2;
- const eyeWhite=sph(torso,new THREE.SphereGeometry(.105,16,12),white,side*.19,2.02,.78,.95,1,.45);eyeWhites.push(eyeWhite);
- sph(torso,new THREE.SphereGeometry(.073,16,12),eye,side*.19,2.02,.84,.9,1,.45);
- sph(torso,new THREE.SphereGeometry(.026,10,8),white,side*.215,2.055,.875,1,1,.5);
- // expressive raised eyebrows and warm cheek spots
- let brow=sph(torso,new THREE.CapsuleGeometry(.025,.14,4,8),brown,side*.19,2.18,.79);brow.rotation.z=side*-.18;
- sph(torso,new THREE.SphereGeometry(.075,14,10),pink,side*.34,1.79,.72,1.25,.62,.35);
- for(let k=0;k<3;k++)sph(torso,new THREE.SphereGeometry(.018,8,6),brown,side*(.29+k*.045),1.78+(k%2)*.035,.755,1,1,.5);
-}
-// muzzle and nose
-sph(torso,new THREE.SphereGeometry(.22,20,16),cream,0,1.72,.78,1.25,.72,.75);
-sph(torso,new THREE.SphereGeometry(.075,16,12),dark,0,1.81,.96,1, .8,.7);
-// little smile
-const smile=new THREE.Mesh(new THREE.TorusGeometry(.095,.018,6,16,Math.PI),dark);smile.position.set(0,1.62,.96);smile.rotation.set(Math.PI,0,0);torso.add(smile);
-// tailored explorer jacket layered over the belly, with piping and utility details
-sph(torso,new THREE.SphereGeometry(.48,28,20),jacket,0,1.12,-.015,.92,.92,.78);
-sph(torso,new THREE.SphereGeometry(.25,22,16),cream,0,1.12,.49,.95,.85,.22);
-sph(torso,new THREE.BoxGeometry(.055,.72,.045),goldTrim,0,1.12,.515);
-for(const side of [-1,1]){
- sph(torso,new THREE.SphereGeometry(.075,12,10),goldTrim,side*.29,1.31,.49,1,.7,.35);
- sph(torso,new THREE.SphereGeometry(.055,12,10),goldTrim,side*.29,.96,.49,1,.7,.35);
-}
-// scarf, backpack and straps
-const scarf=sph(torso,new THREE.TorusGeometry(.43,.105,10,32),red,0,1.52,-.02,1,1,.8);scarf.rotation.x=Math.PI/2;
-const scarfTail=sph(torso,new THREE.CapsuleGeometry(.09,.38,4,8),red,-.34,1.28,-.35,.8,1,.7);scarfTail.rotation.z=-.48;
-const pack=sph(torso,new THREE.BoxGeometry(.48,.58,.28),blue,0,1.18,-.58,1,1,1);
-for(const side of [-1,1]){let strap=sph(torso,new THREE.CapsuleGeometry(.045,.46,4,8),red,side*.37,1.42,-.22);strap.rotation.z=side*.3}
-// waist belt, buckle and small side pouch
-const belt=sph(torso,new THREE.TorusGeometry(.39,.055,8,28),brown,0,.72,0,1,1,.82);belt.rotation.x=Math.PI/2;
-sph(torso,new THREE.BoxGeometry(.19,.16,.07),goldTrim,0,.72,.39);
-sph(torso,new THREE.BoxGeometry(.19,.23,.18),red,.43,.82,-.02);
-// articulated arms and legs
-const arms=[limb(torso,-.55,1.45,0,orange,.14,.48),limb(torso,.55,1.45,0,orange,.14,.48)];
-const legs=[limb(player,-.25,.53,0,dark,.16,.48),limb(player,.25,.53,0,dark,.16,.48)];
-// Feet and hands are attached to their joints so they follow every step and arm swing
-const feet=legs.map((leg)=>sph(leg,new THREE.SphereGeometry(.19,18,14),dark,0,-.43,.12,1,.62,1.35));
-const hands=arms.map((arm)=>{
- const palm=sph(arm,new THREE.SphereGeometry(.145,18,14),cream,0,-.48,.015,1,1,1);
- // three tiny rounded fingers and a thumb make the paws read clearly
- for(let f=-1;f<=1;f++)sph(arm,new THREE.SphereGeometry(.045,10,8),cream,f*.075,-.575,.085,1,1.15,1);
- sph(arm,new THREE.SphereGeometry(.052,10,8),cream,.115,-.49,.045,1,1,1);
- return palm;
-});
-// polished explorer boots with bright cuffs and toe caps
-for(let i=0;i<2;i++){
- sph(legs[i],new THREE.CylinderGeometry(.17,.18,.12,16),jacketLight,0,-.28,.015,1,1,1);
- sph(legs[i],new THREE.SphereGeometry(.13,14,10),goldTrim,0,-.44,.20,1,.55,.45);
-}
-const tailGroup=new THREE.Group();tailGroup.position.set(0,.88,-.48);player.add(tailGroup);
-let tail=sph(tailGroup,new THREE.ConeGeometry(.34,1.05,20),orange,0,0,-.42);tail.rotation.x=-.9;
-sph(tailGroup,new THREE.SphereGeometry(.25,18,14),cream,0,-.34,-.78,1,1.1,1);
-// soft layered tail tufts give the silhouette a fuller animated finish
-sph(tailGroup,new THREE.SphereGeometry(.23,16,12),orangeLight,-.16,-.16,-.38,1,.8,1.1);
-sph(tailGroup,new THREE.SphereGeometry(.22,16,12),orange,.16,-.16,-.40,1,.8,1.1);
-player.position.set(0,0,8);
-// coin line with varied positions
-const coins=[];
-for(let i=0;i<12;i++){let c=new THREE.Mesh(new THREE.TorusGeometry(.38,.12,10,24),gold);c.position.set(Math.sin(i*1.7)*3.2,1.25,-5-i*5.5);c.castShadow=true;scene.add(c);coins.push(c)}
-// colorful checkpoint arches
-for(let z=-16;z>-48;z-=16){let a=box(.35,3,.35,mat(0x4d7bdb),-3.4,1.5,z);let b=box(.35,3,.35,mat(0x4d7bdb),3.4,1.5,z);box(6.8,.35,.35,mat(0xf4b942),0,3,z)}
-// movement state
-let active=false,remaining=60,collected=0,score=0,velocityY=0,onGround=true,move={x:0,y:0},running=false;
-let yaw=0, cameraYaw=0, cameraPitch=0;
-let gaitPhase=0, landingKick=0, previousY=0, lastVX=0, lastVZ=0, blinkClock=0, blinkValue=0;
-const moveVelocity=new THREE.Vector3();
-const cameraLook=new THREE.Vector3(0,1.3,0);
-const cameraDesired=new THREE.Vector3();
-const clock=new THREE.Clock();
-const joy=document.getElementById('joystick'),stick=document.getElementById('stick');let joyId=null;
-function setJoy(e){let r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,len=Math.hypot(dx,dy),max=48;if(len>max){dx=dx/len*max;dy=dy/len*max}stick.style.transform=`translate(${dx}px,${dy}px)`;let power=Math.max(0,(len/max-.10)/.90);move.x=(len>0?dx/len:0)*power;move.y=(len>0?-dy/len:0)*power}
-joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(joyId);setJoy(e)});
-joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)setJoy(e)});
-function resetJoy(){joyId=null;move={x:0,y:0};stick.style.transform='translate(0,0)'}
-joy.addEventListener('pointerup',resetJoy);joy.addEventListener('pointercancel',resetJoy);
-// Right-side drag controls the third-person camera independently of movement
-let cameraPointerId=null,lastCameraX=0,lastCameraY=0;
-renderer.domElement.addEventListener('pointerdown',e=>{
- if(e.pointerType==='mouse' && e.button!==0)return;
- if(e.clientX < innerWidth*.42)return;
- cameraPointerId=e.pointerId;lastCameraX=e.clientX;lastCameraY=e.clientY;
- renderer.domElement.setPointerCapture(e.pointerId);
-});
-renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==cameraPointerId)return;
- const dx=e.clientX-lastCameraX,dy=e.clientY-lastCameraY;lastCameraX=e.clientX;lastCameraY=e.clientY;
- cameraYaw-=dx*.0065;cameraPitch=THREE.MathUtils.clamp(cameraPitch+dy*.004,-.28,.48);
-});
-function endCameraDrag(e){if(e.pointerId===cameraPointerId)cameraPointerId=null}
-renderer.domElement.addEventListener('pointerup',endCameraDrag);renderer.domElement.addEventListener('pointercancel',endCameraDrag);
-document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();if(active&&onGround){velocityY=8.5;onGround=false}});
-document.getElementById('run').addEventListener('pointerdown',()=>running=true);document.getElementById('run').addEventListener('pointerup',()=>running=false);document.getElementById('run').addEventListener('pointerleave',()=>running=false);
-addEventListener('keydown',e=>{if(e.key===' '&&onGround&&active){velocityY=8.5;onGround=false} if(e.key==='Shift')running=true});
-addEventListener('keyup',e=>{if(e.key==='Shift')running=false});
-document.getElementById('start').onclick=()=>{active=true;remaining=60;collected=0;score=0;moveVelocity.set(0,0,0);gaitPhase=0;landingKick=0;previousY=0;lastVX=0;lastVZ=0;torso.rotation.set(0,0,0);yaw=0;cameraYaw=0;cameraPitch=0;player.rotation.y=0;player.position.set(0,0,8);camera.position.set(0,5,16);cameraLook.set(0,1.3,7);document.getElementById('start').style.display='none';document.getElementById('message').textContent='انطلق! اجمع العملات وتجاوز العقبات';document.getElementById('coins').textContent='0';document.getElementById('score').textContent='0'};
-function update(dt){
- if(active){remaining-=dt;if(remaining<=0){remaining=0;active=false;document.getElementById('start').textContent='العب مرة تانية 🔄';document.getElementById('start').style.display='block';document.getElementById('message').textContent=`انتهت المغامرة! جمعت ${collected} عملة`;}
- let forward=move.y,side=move.x;
- let inputPower=Math.min(1,Math.hypot(side,forward));
- let desiredYaw=inputPower>.06?cameraYaw+Math.atan2(side,forward):yaw;
- // Smoothly turn toward the requested direction instead of snapping instantly
- if(inputPower>.06){let angleDelta=Math.atan2(Math.sin(desiredYaw-yaw),Math.cos(desiredYaw-yaw));yaw+=angleDelta*(1-Math.exp(-9*dt))}
- let topSpeed=(running?10.5:6.2)*inputPower;
- let targetVX=Math.sin(desiredYaw)*topSpeed;
- let targetVZ=-Math.cos(desiredYaw)*topSpeed;
- let response=inputPower>.06?7.5:10.5;
- moveVelocity.x=THREE.MathUtils.damp(moveVelocity.x,targetVX,response,dt);
- moveVelocity.z=THREE.MathUtils.damp(moveVelocity.z,targetVZ,response,dt);
- if(inputPower<.01){moveVelocity.x=THREE.MathUtils.damp(moveVelocity.x,0,12,dt);moveVelocity.z=THREE.MathUtils.damp(moveVelocity.z,0,12,dt)}
- if(Math.hypot(moveVelocity.x,moveVelocity.z)>.16){player.rotation.y= yaw;player.position.x+=moveVelocity.x*dt;player.position.z+=moveVelocity.z*dt}
- player.position.x=THREE.MathUtils.clamp(player.position.x,-5.5,5.5);
- if(Math.abs(player.position.x)>=5.49)moveVelocity.x=0;
- velocityY-=20*dt;player.position.y+=velocityY*dt;if(player.position.y<=0){player.position.y=0;velocityY=0;onGround=true}
- for(let c of coins){if(c.visible&&player.position.distanceTo(c.position)<1.35){c.visible=false;collected++;score+=100;document.getElementById('coins').textContent=collected;document.getElementById('score').textContent=score;document.getElementById('message').textContent='عملة جديدة! ممتاز 🪙'}}
- }
- for(let c of coins){if(c.visible){c.rotation.y+=dt*2.2;c.position.y=1.25+Math.sin(clock.elapsedTime*2+c.position.z)*.16}}
- // Procedural character animation: grounded footfalls, counter-swinging arms,
- // acceleration lean, jump pose, landing recovery, breathing and reactive tail.
- const actualSpeed=Math.hypot(moveVelocity.x,moveVelocity.z);
- const speedBlend=THREE.MathUtils.clamp(actualSpeed/6.8,0,1);
- const moving=active&&actualSpeed>.22;
- const sprintBlend=running?1:0;
- const cadence=THREE.MathUtils.lerp(8.8,13.8,sprintBlend)*THREE.MathUtils.lerp(.45,1,speedBlend);
- if(moving&&onGround) gaitPhase+=dt*cadence;
- const stride=Math.sin(gaitPhase);
- const opposite=Math.sin(gaitPhase+Math.PI);
- const liftA=Math.max(0,Math.cos(gaitPhase));
- const liftB=Math.max(0,Math.cos(gaitPhase+Math.PI));
- const air=player.position.y>.025;
- const accelX=(moveVelocity.x-lastVX)/Math.max(dt,.001);
- const accelZ=(moveVelocity.z-lastVZ)/Math.max(dt,.001);
- lastVX=moveVelocity.x;lastVZ=moveVelocity.z;
- const landingNow=previousY>.08&&player.position.y<=.001;
- if(landingNow)landingKick=1;
- previousY=player.position.y;
- landingKick=Math.max(0,landingKick-dt*3.8);
- const walkAmount=moving&&!air?speedBlend:0;
- legs[0].rotation.x=air?-.42:stride*.72*walkAmount;
- legs[1].rotation.x=air?-.42:opposite*.72*walkAmount;
- legs[0].rotation.z=air?-.10:liftA*.08*walkAmount;
- legs[1].rotation.z=air?.10:-liftB*.08*walkAmount;
- feet[0].position.y=-.43+(air?0:liftA*.13*walkAmount);
- feet[1].position.y=-.43+(air?0:liftB*.13*walkAmount);
- arms[0].rotation.x=air?-.95:-stride*.58*walkAmount-(running?-.12:0);
- arms[1].rotation.x=air?-.95:-opposite*.58*walkAmount-(running?-.12:0);
- arms[0].rotation.z=-.10- walkAmount*.08; arms[1].rotation.z=.10+walkAmount*.08;
- torso.rotation.x=THREE.MathUtils.damp(torso.rotation.x,air?-.16:THREE.MathUtils.clamp(-accelZ*.018,-.18,.2),9,dt);
- torso.rotation.z=THREE.MathUtils.damp(torso.rotation.z,THREE.MathUtils.clamp(-accelX*.018,-.18,.18),8,dt);
- torso.position.x=THREE.MathUtils.damp(torso.position.x,Math.sin(gaitPhase*.5)*.035*walkAmount,8,dt);
- // natural occasional blink; eyes briefly narrow then reopen
- blinkClock+=dt;
- if(blinkClock>3.1+Math.sin(clock.elapsedTime*.37)*1.15){blinkValue=Math.min(1,blinkValue+dt*13);if(blinkValue>=1)blinkClock=0;}
- if(blinkValue>0){blinkValue=Math.max(0,blinkValue-dt*9);}
- for(const e of eyeWhites)e.scale.y=.45*(1-.88*blinkValue);
- const breathe=Math.sin(clock.elapsedTime*2.1)*.012;
- const runBob=air?0:(moving?Math.abs(Math.sin(gaitPhase*2))*.045*walkAmount:0);
- torso.position.y=(air?0:runBob+breathe)-landingKick*.10;
- torso.scale.y=1-landingKick*.055;torso.scale.x=1+landingKick*.025;
- tailGroup.rotation.x=Math.sin(clock.elapsedTime*4.2+gaitPhase*.35)*(.12+walkAmount*.18)+(air?-.22:0);
- tailGroup.rotation.z=Math.sin(gaitPhase*.5)*.22*walkAmount;
- scarfTail.rotation.x=-.18-Math.max(0,actualSpeed-2)*.025+Math.sin(clock.elapsedTime*8)*.04;
- // chase camera behind the character, smoothly following heading
- const horizontalDistance=7.2*Math.cos(cameraPitch);
- const behind=new THREE.Vector3(Math.sin(cameraYaw)*horizontalDistance,4.6+cameraPitch*5,Math.cos(cameraYaw)*horizontalDistance);
- cameraDesired.copy(player.position).add(behind);
- camera.position.x=THREE.MathUtils.damp(camera.position.x,cameraDesired.x,4.8,dt);
- camera.position.y=THREE.MathUtils.damp(camera.position.y,cameraDesired.y,4.8,dt);
- camera.position.z=THREE.MathUtils.damp(camera.position.z,cameraDesired.z,4.8,dt);
- const lookTarget=new THREE.Vector3(player.position.x-Math.sin(cameraYaw)*1.0,1.45+player.position.y,player.position.z-Math.cos(cameraYaw)*1.0);
- cameraLook.lerp(lookTarget,1-Math.exp(-7*dt));camera.lookAt(cameraLook);
- document.getElementById('time').textContent=Math.ceil(remaining);
-}
-function animate(){requestAnimationFrame(animate);let dt=Math.min(clock.getDelta(),.04);update(dt);renderer.render(scene,camera)}animate();
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-</script>
-</body></html>
+const root=document.querySelector('#game'),scene=new THREE.Scene();scene.background=new THREE.Color(0x8ed8ff);scene.fog=new THREE.Fog(0x8ed8ff,35,105);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,180),renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;root.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xeaf8ff,0x71865d,2.1));const sun=new THREE.DirectionalLight(0xfff2d5,2.3);sun.position.set(-12,24,10);sun.castShadow=true;sun.shadow.mapSize.set(1536,1536);scene.add(sun);
+const mat=(c,r=.8,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});const grass=mat(0x4fae61),path=mat(0xd9bd8d),wood=mat(0x80502f),gold=mat(0xffc928,.25,.6),rock=mat(0x8495a8);
+function add(mesh,x,y,z,sh=true){mesh.position.set(x,y,z);mesh.castShadow=sh;mesh.receiveShadow=true;scene.add(mesh);return mesh}function box(w,h,d,m,x,y,z){return add(new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m),x,y,z)}
+add(new THREE.Mesh(new THREE.PlaneGeometry(100,150),grass),0,-.08,-20).rotation.x=-Math.PI/2;add(new THREE.Mesh(new THREE.PlaneGeometry(7,150),path),0,0,-20).rotation.x=-Math.PI/2;
+for(let z=-85;z<55;z+=9)for(const x of [-1,1]){let px=x*(7+Math.sin(z)*1.3);let trunk=add(new THREE.Mesh(new THREE.CylinderGeometry(.18,.28,2,9),wood),px,1,z);for(let k=0;k<3;k++)add(new THREE.Mesh(new THREE.IcosahedronGeometry(1-k*.12,1),mat([0x23884f,0x2e9b58,0x43ad65][k])),px+(k-1)*.3,2.1+k*.42,z+(k%2)*.2)}
+for(let i=0;i<22;i++){let x=(i%2?1:-1)*(4.5+(i%4)*.6),z=-12-i*3.2;let p=add(new THREE.Mesh(new THREE.DodecahedronGeometry(.55+(i%3)*.12),rock),x,.35,z);p.scale.y=.7}
+// decorative floating pennants and checkpoint arches
+for(let z=-18;z>-75;z-=19){box(.22,3,.22,mat(0x4d7bdb),-3.35,1.5,z);box(.22,3,.22,mat(0x4d7bdb),3.35,1.5,z);box(6.7,.28,.28,mat(0xf4b942),0,3,z)}
+// Fox adventurer, built from articulated rounded meshes
+const player=new THREE.Group();scene.add(player);const torso=new THREE.Group();player.add(torso);const orange=mat(0xf47d32),cream=mat(0xffe8c9),dark=mat(0x30263a),white=mat(0xffffff),eye=mat(0x171923),blue=mat(0x246da7),red=mat(0xe84d59),trim=mat(0xffcf62,.35,.2),pink=mat(0xff9b9f);
+function sph(parent,g,m,x,y,z,sx=1,sy=1,sz=1){let o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}function limb(parent,x,y,z,m){let p=new THREE.Group();p.position.set(x,y,z);parent.add(p);sph(p,new THREE.CapsuleGeometry(.14,.42,5,10),m,0,-.2,0);return p}
+sph(torso,new THREE.SphereGeometry(.55,28,22),orange,0,1.08,0,.9,1,.75);sph(torso,new THREE.SphereGeometry(.48,28,22),orange,0,1.94,0,1,.9,.86);sph(torso,new THREE.SphereGeometry(.31,20,16),cream,0,1.77,.42,1,.7,.5);
+for(let s of [-1,1]){let ear=sph(torso,new THREE.ConeGeometry(.22,.65,14),orange,s*.32,2.53,-.02);ear.rotation.z=-s*.18;sph(torso,new THREE.ConeGeometry(.1,.36,12),pink,s*.32,2.54,.1);sph(torso,new THREE.SphereGeometry(.105,16,12),white,s*.19,2.02,.72,1,1,.45);sph(torso,new THREE.SphereGeometry(.07,14,10),eye,s*.19,2.02,.78);sph(torso,new THREE.SphereGeometry(.025,8,8),white,s*.21,2.05,.83);sph(torso,new THREE.SphereGeometry(.07,12,10),pink,s*.34,1.78,.67,1.2,.6,.3)}
+sph(torso,new THREE.SphereGeometry(.2,18,14),cream,0,1.72,.76,1.25,.7,.7);sph(torso,new THREE.SphereGeometry(.07,12,10),dark,0,1.82,.91);sph(torso,new THREE.SphereGeometry(.47,24,18),blue,0,1.12,-.02,.95,.9,.78);sph(torso,new THREE.SphereGeometry(.25,18,14),cream,0,1.12,.42,1,.8,.3);sph(torso,new THREE.TorusGeometry(.42,.09,9,28),red,0,1.5,-.02,1,1,.8).rotation.x=Math.PI/2;sph(torso,new THREE.BoxGeometry(.45,.55,.25),blue,0,1.18,-.55);sph(torso,new THREE.TorusGeometry(.39,.045,8,24),wood,0,.72,0,1,1,.8).rotation.x=Math.PI/2;sph(torso,new THREE.BoxGeometry(.16,.15,.06),trim,0,.72,.38);
+const arms=[limb(torso,-.54,1.42,0,orange),limb(torso,.54,1.42,0,orange)],legs=[limb(player,-.24,.5,0,dark),limb(player,.24,.5,0,dark)];for(let i=0;i<2;i++){sph(arms[i],new THREE.SphereGeometry(.14,14,12),cream,0,-.43,.02);sph(legs[i],new THREE.SphereGeometry(.19,14,12),dark,0,-.39,.12,1,.6,1.3);sph(legs[i],new THREE.CylinderGeometry(.17,.18,.1,14),trim,0,-.27,0)}const tail=new THREE.Group();tail.position.set(0,.85,-.45);player.add(tail);sph(tail,new THREE.ConeGeometry(.34,1.05,18),orange,0,0,-.4).rotation.x=-.9;sph(tail,new THREE.SphereGeometry(.24,16,12),cream,0,-.35,-.75,1,1,.9);player.position.set(0,0,8);
+// collectible coins
+const coins=[];for(let i=0;i<18;i++){let c=add(new THREE.Mesh(new THREE.TorusGeometry(.34,.105,10,22),gold),Math.sin(i*1.7)*2.65,1.25,-6-i*4.5);coins.push(c)}
+// moving sweepers: glowing padded bars across the path; jump over them
+const hazards=[];for(let i=0;i<5;i++){let g=new THREE.Group();scene.add(g);let bar=new THREE.Mesh(new THREE.BoxGeometry(2.0,.48,.65),mat(0xef5365,.35));g.add(bar);let cap1=new THREE.Mesh(new THREE.SphereGeometry(.25,14,12),mat(0xffd36a));cap1.position.x=-1;g.add(cap1);let cap2=cap1.clone();cap2.position.x=1;g.add(cap2);g.position.set(0,.55,-13-i*13);g.userData.phase=i*1.7;hazards.push(g)}
+// spring pads and raised stepping platforms as optional routes
+const pads=[];for(let i=0;i<5;i++){let z=-20-i*13,x=(i%2?1:-1)*2.15;let p=add(new THREE.Mesh(new THREE.CylinderGeometry(.75,.85,.22,24),mat(0x35c9bb,.3,.2)),x,.12,z);let ring=add(new THREE.Mesh(new THREE.TorusGeometry(.58,.07,8,28),gold),x,.27,z);ring.rotation.x=Math.PI/2;pads.push({mesh:p,x,z,ring})}
+// impact and pickup particles
+const particles=[];function burst(pos,color,count=12){for(let i=0;i<count;i++){let m=new THREE.Mesh(new THREE.SphereGeometry(.055+Math.random()*.04,8,7),mat(color,.4));m.position.copy(pos);scene.add(m);particles.push({mesh:m,vel:new THREE.Vector3((Math.random()-.5)*4,1+Math.random()*4,(Math.random()-.5)*4),life:.65})}}
+let active=false,remaining=75,collected=0,score=0,vy=0,onGround=true,move={x:0,y:0},running=false,yaw=0,camYaw=0,camPitch=0,phase=0,lastVX=0,lastVZ=0;const velocity=new THREE.Vector3(),clock=new THREE.Clock(),look=new THREE.Vector3(0,1.3,0),desired=new THREE.Vector3();const joy=document.querySelector('#joystick'),stick=document.querySelector('#stick');let joyId=null;
+function setJoy(e){let r=joy.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,l=Math.hypot(dx,dy),max=48;if(l>max){dx=dx/l*max;dy=dy/l*max}stick.style.transform=`translate(${dx}px,${dy}px)`;let p=Math.max(0,(l/max-.1)/.9);move.x=(l?dx/l:0)*p;move.y=(l?-dy/l:0)*p}joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(joyId);setJoy(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)setJoy(e)});function resetJoy(){joyId=null;move={x:0,y:0};stick.style.transform='translate(0,0)'}joy.addEventListener('pointerup',resetJoy);joy.addEventListener('pointercancel',resetJoy);
+let camId=null,cx=0,cy=0;renderer.domElement.addEventListener('pointerdown',e=>{if(e.clientX<innerWidth*.42)return;camId=e.pointerId;cx=e.clientX;cy=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==camId)return;camYaw-=(e.clientX-cx)*.0065;camPitch=THREE.MathUtils.clamp(camPitch+(e.clientY-cy)*.004,-.25,.42);cx=e.clientX;cy=e.clientY});renderer.domElement.addEventListener('pointerup',e=>{if(e.pointerId===camId)camId=null});
+function jump(){if(active&&onGround){vy=8.7;onGround=false;burst(player.position.clone().add(new THREE.Vector3(0,.1,0)),0x74f5e8,7)}}document.querySelector('#jump').addEventListener('pointerdown',e=>{e.preventDefault();jump()});document.querySelector('#run').addEventListener('pointerdown',()=>running=true);['pointerup','pointercancel','pointerleave'].forEach(ev=>document.querySelector('#run').addEventListener(ev,()=>running=false));addEventListener('keydown',e=>{if(e.code==='Space')jump();if(e.key==='Shift')running=true});addEventListener('keyup',e=>{if(e.key==='Shift')running=false});
+function start(){active=true;remaining=75;collected=score=0;velocity.set(0,0,0);vy=0;onGround=true;phase=0;player.position.set(0,0,8);yaw=camYaw=camPitch=0;coins.forEach(c=>c.visible=true);document.querySelector('#coins').textContent='0';document.querySelector('#score').textContent='0';document.querySelector('#start').style.display='none';document.querySelector('#message').textContent='انطلق! اقفز فوق الحواجز واجمع العملات';}document.querySelector('#start').onclick=start;
+function update(dt,t){if(active){remaining-=dt;if(remaining<=0){remaining=0;active=false;document.querySelector('#start').textContent='العب مرة تانية 🔄';document.querySelector('#start').style.display='block';document.querySelector('#message').textContent=`انتهت الجولة! جمعت ${collected} عملة`}
+let power=Math.min(1,Math.hypot(move.x,move.y)),targetYaw=power>.06?camYaw+Math.atan2(move.x,move.y):yaw;if(power>.06){let d=Math.atan2(Math.sin(targetYaw-yaw),Math.cos(targetYaw-yaw));yaw+=d*(1-Math.exp(-9*dt))}let speed=(running?10.5:6.2)*power;velocity.x=THREE.MathUtils.damp(velocity.x,Math.sin(yaw)*speed,power>.06?7.5:10,dt);velocity.z=THREE.MathUtils.damp(velocity.z,-Math.cos(yaw)*speed,power>.06?7.5:10,dt);if(power<.01){velocity.x=THREE.MathUtils.damp(velocity.x,0,11,dt);velocity.z=THREE.MathUtils.damp(velocity.z,0,11,dt)}if(Math.hypot(velocity.x,velocity.z)>.12){player.rotation.y=yaw;player.position.x+=velocity.x*dt;player.position.z+=velocity.z*dt}player.position.x=THREE.MathUtils.clamp(player.position.x,-5.4,5.4);vy-=20*dt;player.position.y+=vy*dt;if(player.position.y<=0){player.position.y=0;vy=0;onGround=true}
+for(let c of coins)if(c.visible&&player.position.distanceTo(c.position)<1.15){c.visible=false;collected++;score+=100;document.querySelector('#coins').textContent=collected;document.querySelector('#score').textContent=score;document.querySelector('#message').textContent='رائع! عملة جديدة 🪙';burst(c.position,0xffd43b,16)}
+for(let h of hazards){h.position.x=Math.sin(t*1.35+h.userData.phase)*1.45;if(Math.abs(player.position.z-h.position.z)<.8&&Math.abs(player.position.x-h.position.x)<1.35&&player.position.y<.85){player.position.z+=2.3;velocity.multiplyScalar(.25);score=Math.max(0,score-50);document.querySelector('#score').textContent=score;document.querySelector('#message').textContent='خد بالك من الحاجز! حاول تقفز 😅';burst(player.position.clone().add(new THREE.Vector3(0,.6,0)),0xff765e,10)}}
+for(let p of pads)if(Math.abs(player.position.z-p.z)<.8&&Math.abs(player.position.x-p.x)<.8&&onGround){vy=11;onGround=false;document.querySelector('#message').textContent='قفزة خارقة! 🚀';burst(p.mesh.position.clone().add(new THREE.Vector3(0,.4,0)),0x55fff0,18)} }
+for(let c of coins)if(c.visible){c.rotation.y+=dt*2.4;c.position.y=1.25+Math.sin(t*2+c.position.z)*.15}hazards.forEach((h,i)=>{h.rotation.y=Math.sin(t*1.4+h.userData.phase)*.16});pads.forEach(p=>p.ring.rotation.z+=dt*.7);
+let sp=Math.hypot(velocity.x,velocity.z),walking=active&&sp>.2,air=player.position.y>.03;if(walking&&onGround)phase+=dt*(running?13.5:9)*Math.min(1,sp/6);let s=Math.sin(phase),o=Math.sin(phase+Math.PI);legs[0].rotation.x=air?-.45:s*.7;legs[1].rotation.x=air?-.45:o*.7;arms[0].rotation.x=air?-.8:-s*.5;arms[1].rotation.x=air?-.8:-o*.5;torso.position.y=air?0:(walking?Math.abs(Math.sin(phase*2))*.04:Math.sin(t*2)*.012);torso.rotation.x=THREE.MathUtils.damp(torso.rotation.x,air?-.15:0,7,dt);tail.rotation.z=Math.sin(t*3+phase*.4)*(.1+Math.min(sp/12,.2));
+for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.life-=dt;p.vel.y-=8*dt;p.mesh.position.addScaledVector(p.vel,dt);p.mesh.scale.setScalar(Math.max(.01,p.life));if(p.life<=0){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();particles.splice(i,1)}}
+let dist=7.3*Math.cos(camPitch);desired.set(player.position.x+Math.sin(camYaw)*dist,player.position.y+4.5+camPitch*5,player.position.z+Math.cos(camYaw)*dist);camera.position.lerp(desired,1-Math.exp(-4.8*dt));look.lerp(new THREE.Vector3(player.position.x-Math.sin(camYaw),1.45+player.position.y,player.position.z-Math.cos(camYaw)),1-Math.exp(-7*dt));camera.lookAt(look);document.querySelector('#time').textContent=Math.ceil(remaining)}
+function animate(){requestAnimationFrame(animate);let dt=Math.min(clock.getDelta(),.04);update(dt,clock.elapsedTime);renderer.render(scene,camera)}animate();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script></body></html>
