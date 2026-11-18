@@ -1,30 +1,152 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#171024"><link rel="manifest" href="manifest.webmanifest">
-<title>فوضى التحديات</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#171024">
+<title>فوضى التحديات - ساحة 3D</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:radial-gradient(circle at top,#47245d,#130f20 65%);color:#fff;min-height:100vh;padding:18px}
-main{max-width:620px;margin:auto}.card{background:#ffffff12;border:1px solid #ffffff25;border-radius:22px;padding:20px;margin:14px 0;box-shadow:0 12px 35px #0005}
-h1{font-size:2rem;margin:.3em 0;color:#ffd5f4}h2{color:#ffe0f6}button{border:0;border-radius:14px;padding:13px 18px;margin:5px;background:#ff70c5;color:#28112a;font-weight:800;font-size:1rem}
-button.alt{background:#ffffff20;color:white;border:1px solid #ffffff30}.animal{font-size:3rem}.muted{color:#d9c9df}.row{display:flex;flex-wrap:wrap;gap:8px}.score{font-size:1.3rem;color:#ffe28a}#challenge{font-size:1.35rem;line-height:1.8;min-height:90px}input{padding:12px;border-radius:12px;border:0;width:100%;margin:8px 0}
-</style></head>
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#41215b,#100d1b 70%);color:#fff;font-family:system-ui,Arial;min-height:100vh}
+main{max-width:760px;margin:auto;padding:14px}
+header,.panel{background:#ffffff12;border:1px solid #ffffff26;border-radius:20px;padding:15px;margin:12px 0;box-shadow:0 10px 28px #0005}
+h1{margin:2px 0;color:#ffe0f7;font-size:1.8rem}h2{margin:4px 0 12px;color:#ffe0f7;font-size:1.15rem}
+.muted{color:#d8c8e1;font-size:.92rem;line-height:1.7}
+.stats{color:#ffe28a;font-weight:800}
+#stage{height:390px;position:relative;overflow:hidden;border-radius:22px;border:2px solid #ffffff35;background:linear-gradient(#6ac9ff,#d7f4ff 55%,#7cdebd 56%,#4cbd9a);touch-action:pan-y}
+#stage canvas{display:block;width:100%;height:100%}
+.hud{position:absolute;top:10px;right:10px;left:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.pill{background:#180e2bd9;border:1px solid #ffffff55;border-radius:14px;padding:7px 10px;font-weight:800;font-size:.82rem}
+.controls{position:absolute;bottom:12px;left:12px;display:flex;gap:9px;direction:ltr}
+.controls button{width:58px;height:54px;border-radius:17px;background:#24103bdc;color:#fff;border:1px solid #ffffff70;font-size:1.35rem;font-weight:900;touch-action:none}
+button{border:0;border-radius:13px;padding:12px 16px;margin:4px;background:#ff78c9;color:#28112a;font-weight:900;font-size:1rem}
+button.alt{background:#ffffff20;color:#fff;border:1px solid #ffffff38}
+.row{display:flex;flex-wrap:wrap;gap:6px}.animal{font-size:1.5rem}
+#challenge{font-size:1.15rem;line-height:1.8;min-height:55px}
+input{padding:12px;border-radius:12px;border:0;width:100%;margin:8px 0}
+.small{font-size:.8rem;color:#d9c9df}
+@media(max-width:420px){#stage{height:340px}.controls button{width:52px;height:50px}}
+</style>
+</head>
 <body><main>
-<header class="card"><div class="animal">🐼 🦊 🦝</div><h1>فوضى التحديات</h1><p class="muted">العب، اضحك، واجمع النقاط مع أصحابك!</p><div class="score">⭐ النقاط: <span id="score">0</span>　🪙 العملات: <span id="coins">0</span></div></header>
-<section class="card"><h2>اختار شخصيتك</h2><div class="row" id="animals"><button class="alt" data-a="🐼 باندا">🐼 باندا</button><button class="alt" data-a="🦊 ثعلوب">🦊 ثعلوب</button><button class="alt" data-a="🦆 بطبوط">🦆 بطبوط</button><button class="alt" data-a="🐱 قطقوط">🐱 قطقوط</button><button class="alt" data-a="🦝 راكون">🦝 راكون</button></div><p id="chosen" class="muted">شخصيتك: 🐼 باندا</p></section>
-<section class="card"><h2>جولة التحديات</h2><div id="challenge">اضغط «تحدي جديد» عشان تبدأ الضحك!</div><div class="row"><button id="new">تحدي جديد</button><button id="done" class="alt">خلصت التحدي +10</button></div><p class="muted">الجولات محلية على نفس الجهاز — اللعب الجماعي أونلاين غير مفعّل في هذه النسخة.</p></section>
-<section class="card"><h2>غرفة الأصدقاء</h2><p class="muted">واجهة تجريبية للغرف. الاتصال الحقيقي بين اللاعبين يحتاج خادم أونلاين.</p><button class="alt" id="room">إنشاء كود غرفة تجريبي</button><p id="roomcode"></p></section>
-<section class="card"><h2>المتجر</h2><p>🎩 قبعة النجوم — 30 عملة</p><button id="buy" class="alt">شراء تجريبي</button><p id="shopmsg" class="muted"></p></section>
+<header>
+  <div class="animal">🐼 🦊 🐱 🦝 🦆</div>
+  <h1>فوضى التحديات</h1>
+  <div class="muted">أهلاً بيك في أول ساحة ثلاثية الأبعاد!</div>
+  <p class="stats">⭐ النقاط: <span id="score">0</span>　🪙 العملات: <span id="coins">0</span></p>
+</header>
+
+<section class="panel">
+  <h2>🏟️ ساحة التحديات 3D</h2>
+  <div id="stage">
+    <div class="hud"><span class="pill" id="charLabel">🐼 باندا</span><span class="pill">اسحب الشاشة لتدوير الكاميرا</span></div>
+    <div class="controls">
+      <button id="left" aria-label="يسار">◀</button>
+      <button id="jump" aria-label="قفز">⬆</button>
+      <button id="right" aria-label="يمين">▶</button>
+    </div>
+  </div>
+  <p class="small">حرّك الشخصية بالأسهم، واقفز بالزر الأوسط. اسحب الساحة لتغيير زاوية الرؤية.</p>
+</section>
+
+<section class="panel">
+  <h2>اختار بطلك</h2>
+  <div class="row" id="animals">
+    <button class="alt" data-a="panda">🐼 باندا</button>
+    <button class="alt" data-a="fox">🦊 ثعلوب</button>
+    <button class="alt" data-a="cat">🐱 قطقوط</button>
+    <button class="alt" data-a="raccoon">🦝 راكون</button>
+    <button class="alt" data-a="duck">🦆 بطبوط</button>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>🎯 جولة التحديات</h2>
+  <div id="challenge">اضغط «تحدي جديد» عشان تبدأ!</div>
+  <div class="row"><button id="new">تحدي جديد</button><button id="done" class="alt">خلصت التحدي +10</button></div>
+  <p class="muted">النقاط والعملات محفوظة على جهازك. الغرف والأونلاين الحقيقي هنضيفهم في مرحلة لاحقة.</p>
+</section>
+<section class="panel">
+  <h2>👥 غرفة الأصدقاء</h2>
+  <p class="muted">الغرف هنا تجريبية فقط في المرحلة دي.</p>
+  <button id="room" class="alt">إنشاء كود غرفة تجريبي</button><p id="roomcode"></p>
+</section>
 </main>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const stage=document.getElementById('stage');
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x8bd8ff); scene.fog=new THREE.Fog(0x8bd8ff,16,35);
+const camera=new THREE.PerspectiveCamera(48,stage.clientWidth/stage.clientHeight,.1,100);
+camera.position.set(0,6.5,11); camera.lookAt(0,1,0);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(stage.clientWidth,stage.clientHeight); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+stage.prepend(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xffffff,0x4b6b88,2));
+const sun=new THREE.DirectionalLight(0xffffff,2.5); sun.position.set(-5,10,7); sun.castShadow=true; scene.add(sun);
+
+const mat=(c,rough=.75)=>new THREE.MeshStandardMaterial({color:c,roughness:rough});
+const ground=new THREE.Mesh(new THREE.CircleGeometry(13,64),mat(0x45c58f));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);
+const platform=new THREE.Mesh(new THREE.CylinderGeometry(5.8,6.2,.28,64),mat(0xffd36e));platform.position.y=.02;platform.receiveShadow=true;platform.castShadow=true;scene.add(platform);
+const inner=new THREE.Mesh(new THREE.CylinderGeometry(5.25,5.25,.12,64),mat(0x6bdbce));inner.position.y=.22;scene.add(inner);
+// colorful obstacles around the arena
+for(let i=0;i<10;i++){const a=i*Math.PI*2/10;const g=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(.8,.8,.8),mat([0xff6b9d,0x8d79ff,0xffc857,0x53c8ff][i%4]));b.position.y=.62;b.castShadow=true;g.add(b);g.position.set(Math.cos(a)*4.65,0,Math.sin(a)*4.65);g.rotation.y=a;scene.add(g);}
+for(let i=0;i<18;i++){const a=i*Math.PI*2/18;const m=new THREE.Mesh(new THREE.SphereGeometry(.12,12,10),mat(i%2?0xffffff:0xffe36b));m.position.set(Math.cos(a)*5.65,.55,Math.sin(a)*5.65);scene.add(m);}
+
+function makeAnimal(type){
+ const group=new THREE.Group();
+ const colors={panda:[0xffffff,0x222438],fox:[0xff9b38,0x7a3422],cat:[0xffc5e7,0x9b4f9b],raccoon:[0x999eae,0x34394a],duck:[0xffdf43,0xe89b20]};
+ const [base,dark]=colors[type]||colors.panda;
+ const body=new THREE.Mesh(new THREE.SphereGeometry(.57,24,18),mat(base));body.scale.set(.85,1.05,.72);body.position.y=.85;body.castShadow=true;group.add(body);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.58,28,22),mat(base));head.position.y=1.72;head.castShadow=true;group.add(head);
+ const earGeo=type==='duck'?new THREE.SphereGeometry(.17,16,12):new THREE.SphereGeometry(.22,16,12);
+ for(const x of [-.39,.39]){const ear=new THREE.Mesh(earGeo,mat(type==='fox'?dark:base));ear.position.set(x,2.16,0);ear.scale.set(1,1.2,.65);group.add(ear);}
+ // eyes and eye patches
+ for(const x of [-.21,.21]){
+  if(type==='panda'||type==='raccoon'){const patch=new THREE.Mesh(new THREE.SphereGeometry(.19,16,12),mat(dark));patch.position.set(x,1.82,.49);patch.scale.set(.8,1.15,.35);group.add(patch);}
+  const eye=new THREE.Mesh(new THREE.SphereGeometry(.065,12,10),mat(0x171421));eye.position.set(x,1.84,.59);group.add(eye);
+  const shine=new THREE.Mesh(new THREE.SphereGeometry(.022,8,8),mat(0xffffff));shine.position.set(x-.018,1.87,.64);group.add(shine);
+ }
+ const muzzle=new THREE.Mesh(new THREE.SphereGeometry(type==='duck'?.19:.22,16,12),mat(type==='duck'?0xff8b28:0xffffff));muzzle.position.set(0,1.57,.53);muzzle.scale.set(1,.65,.55);group.add(muzzle);
+ if(type==='duck'){const bill=new THREE.Mesh(new THREE.ConeGeometry(.18,.3,16),mat(0xff7a1b));bill.rotation.x=Math.PI/2;bill.position.set(0,1.56,.78);group.add(bill);}
+ const belly=new THREE.Mesh(new THREE.SphereGeometry(.38,18,14),mat(type==='panda'?0xf4f4f4:0xffe5b5));belly.position.set(0,.83,.48);belly.scale.set(1,.95,.25);group.add(belly);
+ for(const x of [-.32,.32]){const leg=new THREE.Mesh(new THREE.SphereGeometry(.2,14,12),mat(dark));leg.position.set(x,.27,.04);leg.scale.set(1,.8,1.2);group.add(leg);}
+ const tail=new THREE.Mesh(new THREE.SphereGeometry(.22,14,12),mat(type==='fox'?dark:base));tail.position.set(0,.8,-.62);tail.scale.set(.8,.8,1.5);group.add(tail);
+ group.userData={legs:group.children.filter((o,i)=>i>0),type};return group;
+}
+let type='panda',player=makeAnimal(type);scene.add(player);player.position.set(0,.25,0);
+const keys={left:false,right:false};let vy=0,grounded=true,turn=0;
+function choose(t){scene.remove(player);type=t;player=makeAnimal(type);scene.add(player);player.position.set(0,.25,0);document.getElementById('charLabel').textContent=({panda:'🐼 باندا',fox:'🦊 ثعلوب',cat:'🐱 قطقوط',raccoon:'🦝 راكون',duck:'🦆 بطبوط'})[t];}
+document.querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.a)));
+function bindHold(id,key){const el=document.getElementById(id);const on=e=>{e.preventDefault();keys[key]=true},off=e=>{e.preventDefault();keys[key]=false};el.addEventListener('pointerdown',on);['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,off));}
+bindHold('left','left');bindHold('right','right');
+document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();if(grounded){vy=7.2;grounded=false;}});
+let dragging=false,lastX=0;
+renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;});
+window.addEventListener('pointerup',()=>dragging=false);
+window.addEventListener('pointermove',e=>{if(dragging){turn+=(e.clientX-lastX)*.008;lastX=e.clientX;}});
+const clock=new THREE.Clock();
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
+ if(keys.left){player.position.x-=4*dt;player.rotation.y=-.35;}if(keys.right){player.position.x+=4*dt;player.rotation.y=.35;}
+ player.position.x=THREE.MathUtils.clamp(player.position.x,-4.3,4.3);
+ vy-=17*dt;player.position.y+=vy*dt;if(player.position.y<=.25){player.position.y=.25;vy=0;grounded=true;}
+ player.position.z=Math.sin(clock.elapsedTime*2)*.08;
+ player.rotation.y+=(turn-player.rotation.y)*.025;
+ player.children[0].rotation.z=Math.sin(clock.elapsedTime*8)*.04;
+ camera.position.x=Math.sin(turn)*2;camera.position.z=11*Math.cos(turn)+1;camera.lookAt(0,1,0);
+ renderer.render(scene,camera);
+}
+animate();
+new ResizeObserver(()=>{const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);}).observe(stage);
+</script>
+
 <script>
 const tasks=["اتكلم بصوت مذيع أخبار لمدة 20 ثانية","قلّد صوت حيوان وخلي أصحابك يخمنوا","احكي موقف مضحك حصل لك","اعمل وش مضحك لمدة 10 ثواني","غنّي جملة من أغنية بصوت روبوت","امدح اللاعب اللي على يمينك بطريقة كوميدية","اتكلم من غير حرف الميم لمدة 15 ثانية","مثّل إنك بتكسب مليون جنيه"];
 let score=+(localStorage.fpScore||0),coins=+(localStorage.fpCoins||0),current="";const $=id=>document.getElementById(id);
-function render(){$("score").textContent=score;$("coins").textContent=coins;localStorage.fpScore=score;localStorage.fpCoins=coins}
-document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{$("chosen").textContent="شخصيتك: "+b.dataset.a});
-$("new").onclick=()=>{current=tasks[Math.floor(Math.random()*tasks.length)];$("challenge").textContent=current};
-$("done").onclick=()=>{if(!current){$("challenge").textContent="اختار تحدي جديد الأول!";return}score+=10;coins+=5;current="";$("challenge").textContent="برافو! كسبت 10 نقاط و5 عملات 🎉";render()};
-$("room").onclick=()=>{$("roomcode").textContent="كود الغرفة التجريبي: "+Math.random().toString(36).slice(2,7).toUpperCase()};
-$("buy").onclick=()=>{if(coins>=30){coins-=30;$("shopmsg").textContent="مبروك! اشتريت القبعة 🎩"}else $("shopmsg").textContent="اجمع 30 عملة الأول!";render()};render();
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js"));
-</script></body></html>
+function render(){ $("score").textContent=score;$("coins").textContent=coins;localStorage.fpScore=score;localStorage.fpCoins=coins;}
+$("new").onclick=()=>{current=tasks[Math.floor(Math.random()*tasks.length)];$("challenge").textContent=current;};
+$("done").onclick=()=>{if(!current){$("challenge").textContent="اختار تحدي جديد الأول!";return;}score+=10;coins+=5;current="";$("challenge").textContent="برافو! كسبت 10 نقاط و5 عملات 🎉";render();};
+$("room").onclick=()=>{$("roomcode").textContent="كود الغرفة التجريبي: "+Math.random().toString(36).slice(2,7).toUpperCase();};
+render();
+</script>
+</body></html>
