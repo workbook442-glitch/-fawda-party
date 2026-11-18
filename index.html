@@ -1,67 +1,177 @@
 <!doctype html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>فوضى التحديات - مغامرة 3D V10</title>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#10152d">
+<title>فوضى التحديات V11</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#8ed8ff;color:#fff;font-family:system-ui,Tahoma,Arial;touch-action:none}#game{position:fixed;inset:0}canvas{display:block}#hud{position:fixed;inset:0;pointer-events:none}.top{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:7px}.panel{background:#101b30c9;border:1px solid #ffffff40;border-radius:15px;padding:8px 12px;backdrop-filter:blur(8px);font-weight:900;font-size:14px}.panel small{display:block;font-size:10px;opacity:.75}#message{position:absolute;top:75px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#101b30c9;border:1px solid #ffffff40;border-radius:20px;padding:9px 14px;font-size:12px}#joystick{position:absolute;bottom:23px;left:20px;width:138px;height:138px;border-radius:50%;background:#ffffff25;border:2px solid #ffffff65;pointer-events:auto;touch-action:none}#stick{position:absolute;left:40px;top:40px;width:54px;height:54px;border-radius:50%;background:linear-gradient(145deg,#fff,#9dc7ff);box-shadow:0 5px 16px #0007;border:2px solid white}.actions{position:absolute;bottom:28px;right:18px;display:flex;gap:10px;pointer-events:auto}.action{border:2px solid #ffffff90;border-radius:50%;width:68px;height:68px;color:white;font-weight:900;background:linear-gradient(145deg,#ff9e38,#ed4d64);box-shadow:0 7px 18px #0006;touch-action:none}#jump{width:78px;height:78px;background:linear-gradient(145deg,#48d6c8,#1685d4)}#start{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:auto;border:0;border-radius:18px;padding:15px 25px;color:white;font-weight:900;font-size:18px;background:linear-gradient(120deg,#ff8a36,#e83f75);box-shadow:0 12px 35px #0008}#hint{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);font-size:10px;white-space:nowrap;text-shadow:0 2px 5px #000}@media(max-width:380px){.panel{font-size:12px;padding:7px 9px}#message{font-size:10px}}
-</style></head><body><div id="game"></div><div id="hud"><div class="top"><div class="panel">🪙 <span id="coins">0</span><small>العملات</small></div><div class="panel">🏆 <span id="score">0</span><small>النقاط</small></div><div class="panel">⏱️ <span id="time">75</span><small>الوقت</small></div></div><div id="message">V10 — استكشف الغابة واعبر الجسر واجمع العملات!</div><button id="start">ابدأ المغامرة 🎮</button><div id="joystick"><div id="stick"></div></div><div class="actions"><button class="action" id="jump">قفز</button><button class="action" id="run">جري</button></div><div id="hint">العصاية الشمال للحركة • اسحب يمين الشاشة لتحريك الكاميرا</div></div>
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-const root=document.querySelector('#game'),scene=new THREE.Scene();scene.background=new THREE.Color(0x8ed8ff);scene.fog=new THREE.Fog(0x8ed8ff,35,105);
-const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,180),renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;root.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xeaf8ff,0x71865d,2.1));const sun=new THREE.DirectionalLight(0xfff2d5,2.3);sun.position.set(-12,24,10);sun.castShadow=true;sun.shadow.mapSize.set(1536,1536);scene.add(sun);
-const mat=(c,r=.8,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});const grass=mat(0x4fae61),path=mat(0xd9bd8d),wood=mat(0x80502f),gold=mat(0xffc928,.25,.6),rock=mat(0x8495a8);
-function add(mesh,x,y,z,sh=true){mesh.position.set(x,y,z);mesh.castShadow=sh;mesh.receiveShadow=true;scene.add(mesh);return mesh}function box(w,h,d,m,x,y,z){return add(new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m),x,y,z)}
-add(new THREE.Mesh(new THREE.PlaneGeometry(100,150),grass),0,-.08,-20).rotation.x=-Math.PI/2;add(new THREE.Mesh(new THREE.PlaneGeometry(7,150),path),0,0,-20).rotation.x=-Math.PI/2;
-for(let z=-85;z<55;z+=9)for(const x of [-1,1]){let px=x*(7+Math.sin(z)*1.3);let trunk=add(new THREE.Mesh(new THREE.CylinderGeometry(.18,.28,2,9),wood),px,1,z);for(let k=0;k<3;k++)add(new THREE.Mesh(new THREE.IcosahedronGeometry(1-k*.12,1),mat([0x23884f,0x2e9b58,0x43ad65][k])),px+(k-1)*.3,2.1+k*.42,z+(k%2)*.2)}
-for(let i=0;i<22;i++){let x=(i%2?1:-1)*(4.5+(i%4)*.6),z=-12-i*3.2;let p=add(new THREE.Mesh(new THREE.DodecahedronGeometry(.55+(i%3)*.12),rock),x,.35,z);p.scale.y=.7}
-// decorative floating pennants and checkpoint arches
-for(let z=-18;z>-75;z-=19){box(.22,3,.22,mat(0x4d7bdb),-3.35,1.5,z);box(.22,3,.22,mat(0x4d7bdb),3.35,1.5,z);box(6.7,.28,.28,mat(0xf4b942),0,3,z)}
-// Fox adventurer, built from articulated rounded meshes
-const player=new THREE.Group();scene.add(player);const torso=new THREE.Group();player.add(torso);const orange=mat(0xf47d32),cream=mat(0xffe8c9),dark=mat(0x30263a),white=mat(0xffffff),eye=mat(0x171923),blue=mat(0x246da7),red=mat(0xe84d59),trim=mat(0xffcf62,.35,.2),pink=mat(0xff9b9f);
-function sph(parent,g,m,x,y,z,sx=1,sy=1,sz=1){let o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}function limb(parent,x,y,z,m){let p=new THREE.Group();p.position.set(x,y,z);parent.add(p);sph(p,new THREE.CapsuleGeometry(.14,.42,5,10),m,0,-.2,0);return p}
-sph(torso,new THREE.SphereGeometry(.55,28,22),orange,0,1.08,0,.9,1,.75);sph(torso,new THREE.SphereGeometry(.48,28,22),orange,0,1.94,0,1,.9,.86);sph(torso,new THREE.SphereGeometry(.31,20,16),cream,0,1.77,.42,1,.7,.5);
-for(let s of [-1,1]){let ear=sph(torso,new THREE.ConeGeometry(.22,.65,14),orange,s*.32,2.53,-.02);ear.rotation.z=-s*.18;sph(torso,new THREE.ConeGeometry(.1,.36,12),pink,s*.32,2.54,.1);sph(torso,new THREE.SphereGeometry(.105,16,12),white,s*.19,2.02,.72,1,1,.45);sph(torso,new THREE.SphereGeometry(.07,14,10),eye,s*.19,2.02,.78);sph(torso,new THREE.SphereGeometry(.025,8,8),white,s*.21,2.05,.83);sph(torso,new THREE.SphereGeometry(.07,12,10),pink,s*.34,1.78,.67,1.2,.6,.3)}
-sph(torso,new THREE.SphereGeometry(.2,18,14),cream,0,1.72,.76,1.25,.7,.7);sph(torso,new THREE.SphereGeometry(.07,12,10),dark,0,1.82,.91);sph(torso,new THREE.SphereGeometry(.47,24,18),blue,0,1.12,-.02,.95,.9,.78);sph(torso,new THREE.SphereGeometry(.25,18,14),cream,0,1.12,.42,1,.8,.3);sph(torso,new THREE.TorusGeometry(.42,.09,9,28),red,0,1.5,-.02,1,1,.8).rotation.x=Math.PI/2;sph(torso,new THREE.BoxGeometry(.45,.55,.25),blue,0,1.18,-.55);sph(torso,new THREE.TorusGeometry(.39,.045,8,24),wood,0,.72,0,1,1,.8).rotation.x=Math.PI/2;sph(torso,new THREE.BoxGeometry(.16,.15,.06),trim,0,.72,.38);
-const arms=[limb(torso,-.54,1.42,0,orange),limb(torso,.54,1.42,0,orange)],legs=[limb(player,-.24,.5,0,dark),limb(player,.24,.5,0,dark)];for(let i=0;i<2;i++){sph(arms[i],new THREE.SphereGeometry(.14,14,12),cream,0,-.43,.02);sph(legs[i],new THREE.SphereGeometry(.19,14,12),dark,0,-.39,.12,1,.6,1.3);sph(legs[i],new THREE.CylinderGeometry(.17,.18,.1,14),trim,0,-.27,0)}const tail=new THREE.Group();tail.position.set(0,.85,-.45);player.add(tail);sph(tail,new THREE.ConeGeometry(.34,1.05,18),orange,0,0,-.4).rotation.x=-.9;sph(tail,new THREE.SphereGeometry(.24,16,12),cream,0,-.35,-.75,1,1,.9);player.position.set(0,0,8);
-// collectible coins
-const coins=[];for(let i=0;i<18;i++){let c=add(new THREE.Mesh(new THREE.TorusGeometry(.34,.105,10,22),gold),Math.sin(i*1.7)*2.65,1.25,-6-i*4.5);coins.push(c)}
-// moving sweepers: glowing padded bars across the path; jump over them
-const hazards=[];for(let i=0;i<5;i++){let g=new THREE.Group();scene.add(g);let bar=new THREE.Mesh(new THREE.BoxGeometry(2.0,.48,.65),mat(0xef5365,.35));g.add(bar);let cap1=new THREE.Mesh(new THREE.SphereGeometry(.25,14,12),mat(0xffd36a));cap1.position.x=-1;g.add(cap1);let cap2=cap1.clone();cap2.position.x=1;g.add(cap2);g.position.set(0,.55,-13-i*13);g.userData.phase=i*1.7;hazards.push(g)}
-// spring pads and raised stepping platforms as optional routes
-const pads=[];for(let i=0;i<5;i++){let z=-20-i*13,x=(i%2?1:-1)*2.15;let p=add(new THREE.Mesh(new THREE.CylinderGeometry(.75,.85,.22,24),mat(0x35c9bb,.3,.2)),x,.12,z);let ring=add(new THREE.Mesh(new THREE.TorusGeometry(.58,.07,8,28),gold),x,.27,z);ring.rotation.x=Math.PI/2;pads.push({mesh:p,x,z,ring})}
-// V10 environment expansion: lake, waterfall, wooden bridge and secret lookout
-const waterMat=new THREE.MeshStandardMaterial({color:0x25b9d2,roughness:.22,metalness:.12,transparent:true,opacity:.88});
-const water=new THREE.Mesh(new THREE.CircleGeometry(5.2,48),waterMat);water.rotation.x=-Math.PI/2;water.position.set(8.2,.035,-37);water.scale.set(1.25,1.0,.72);water.receiveShadow=true;scene.add(water);
-const waterRim=add(new THREE.Mesh(new THREE.TorusGeometry(5.15,.22,10,48),mat(0x719b62)),8.2,.08,-37);waterRim.rotation.x=Math.PI/2;waterRim.scale.set(1.25,1,.72);
-// rocky waterfall cliff and falling water sheet beside the trail
-for(let i=0;i<5;i++){let b=add(new THREE.Mesh(new THREE.DodecahedronGeometry(1.2+(i%2)*.35),rock),10.5+i*.65,1.0,-43-i*.65);b.scale.set(1.2,1.35,1.0)}
-const fallMat=new THREE.MeshStandardMaterial({color:0x8cecff,transparent:true,opacity:.78,roughness:.18,metalness:.05});
-const waterfall=add(new THREE.Mesh(new THREE.PlaneGeometry(2.3,4.7),fallMat),9.1,2.55,-43.8);waterfall.rotation.y=-.28;
-// shallow creek crossing under a safe timber bridge
-const creek=add(new THREE.Mesh(new THREE.BoxGeometry(12,.08,2.8),waterMat),0,-.015,-51);creek.material=waterMat;
-for(let x=-2.8;x<=2.81;x+=.48){let plank=box(.42,.18,3.25,wood,x,.22,-51);plank.rotation.y=(x%1)*.025}
-for(let side of [-1,1]){box(.18,.42,3.5,mat(0x633d27),side*2.95,.43,-51);for(let z=-52.3;z<=-49.7;z+=1.25){let post=add(new THREE.Mesh(new THREE.CylinderGeometry(.09,.11,.85,8),wood),side*2.95,.78,z)}}
-// rope rails along the bridge edges
-for(let side of [-1,1]){let rail=add(new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,3.35,8),wood),side*2.95,.95,-51);rail.rotation.x=Math.PI/2}
-// secret elevated lookout to the right, with bonus coins
-const lookout=box(3.3,.35,3.2,wood,7.1,2.25,-61);for(let x of [5.7,8.5])for(let z of [-62.2,-59.8])add(new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,2.1,8),wood),x,1.15,z);
-const secretSign=box(1.35,.85,.16,mat(0x285a83),7.1,3.15,-62.55);secretSign.rotation.y=Math.PI;
-const bonusCoins=[];for(let i=0;i<3;i++){let c=add(new THREE.Mesh(new THREE.TorusGeometry(.3,.1,10,20),gold),6.2+i*.9,3.05,-61);bonusCoins.push(c)}
-const fireflies=[];for(let i=0;i<18;i++){let f=add(new THREE.Mesh(new THREE.SphereGeometry(.055,8,8),mat(0xffef8a,.3)),(Math.random()-.5)*17,1.2+Math.random()*3,-28-Math.random()*42,false);fireflies.push({mesh:f,phase:Math.random()*6})}
-// impact and pickup particles
-const particles=[];function burst(pos,color,count=12){for(let i=0;i<count;i++){let m=new THREE.Mesh(new THREE.SphereGeometry(.055+Math.random()*.04,8,7),mat(color,.4));m.position.copy(pos);scene.add(m);particles.push({mesh:m,vel:new THREE.Vector3((Math.random()-.5)*4,1+Math.random()*4,(Math.random()-.5)*4),life:.65})}}
-let active=false,remaining=75,collected=0,score=0,vy=0,onGround=true,move={x:0,y:0},running=false,yaw=0,camYaw=0,camPitch=0,phase=0,lastVX=0,lastVZ=0;const velocity=new THREE.Vector3(),clock=new THREE.Clock(),look=new THREE.Vector3(0,1.3,0),desired=new THREE.Vector3();const joy=document.querySelector('#joystick'),stick=document.querySelector('#stick');let joyId=null;
-function setJoy(e){let r=joy.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,l=Math.hypot(dx,dy),max=48;if(l>max){dx=dx/l*max;dy=dy/l*max}stick.style.transform=`translate(${dx}px,${dy}px)`;let p=Math.max(0,(l/max-.1)/.9);move.x=(l?dx/l:0)*p;move.y=(l?-dy/l:0)*p}joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(joyId);setJoy(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)setJoy(e)});function resetJoy(){joyId=null;move={x:0,y:0};stick.style.transform='translate(0,0)'}joy.addEventListener('pointerup',resetJoy);joy.addEventListener('pointercancel',resetJoy);
-let camId=null,cx=0,cy=0;renderer.domElement.addEventListener('pointerdown',e=>{if(e.clientX<innerWidth*.42)return;camId=e.pointerId;cx=e.clientX;cy=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==camId)return;camYaw-=(e.clientX-cx)*.0065;camPitch=THREE.MathUtils.clamp(camPitch+(e.clientY-cy)*.004,-.25,.42);cx=e.clientX;cy=e.clientY});renderer.domElement.addEventListener('pointerup',e=>{if(e.pointerId===camId)camId=null});
-function jump(){if(active&&onGround){vy=8.7;onGround=false;burst(player.position.clone().add(new THREE.Vector3(0,.1,0)),0x74f5e8,7)}}document.querySelector('#jump').addEventListener('pointerdown',e=>{e.preventDefault();jump()});document.querySelector('#run').addEventListener('pointerdown',()=>running=true);['pointerup','pointercancel','pointerleave'].forEach(ev=>document.querySelector('#run').addEventListener(ev,()=>running=false));addEventListener('keydown',e=>{if(e.code==='Space')jump();if(e.key==='Shift')running=true});addEventListener('keyup',e=>{if(e.key==='Shift')running=false});
-function start(){active=true;remaining=75;collected=score=0;velocity.set(0,0,0);vy=0;onGround=true;phase=0;player.position.set(0,0,8);yaw=camYaw=camPitch=0;coins.forEach(c=>c.visible=true);bonusCoins.forEach(c=>c.visible=true);document.querySelector('#coins').textContent='0';document.querySelector('#score').textContent='0';document.querySelector('#start').style.display='none';document.querySelector('#message').textContent='انطلق! استكشف الغابة واعبر الجسر واجمع العملات';}document.querySelector('#start').onclick=start;
-function update(dt,t){if(active){remaining-=dt;if(remaining<=0){remaining=0;active=false;document.querySelector('#start').textContent='العب مرة تانية 🔄';document.querySelector('#start').style.display='block';document.querySelector('#message').textContent=`انتهت الجولة! جمعت ${collected} عملة`}
-let power=Math.min(1,Math.hypot(move.x,move.y)),targetYaw=power>.06?camYaw+Math.atan2(move.x,move.y):yaw;if(power>.06){let d=Math.atan2(Math.sin(targetYaw-yaw),Math.cos(targetYaw-yaw));yaw+=d*(1-Math.exp(-9*dt))}let speed=(running?10.5:6.2)*power;velocity.x=THREE.MathUtils.damp(velocity.x,Math.sin(yaw)*speed,power>.06?7.5:10,dt);velocity.z=THREE.MathUtils.damp(velocity.z,-Math.cos(yaw)*speed,power>.06?7.5:10,dt);if(power<.01){velocity.x=THREE.MathUtils.damp(velocity.x,0,11,dt);velocity.z=THREE.MathUtils.damp(velocity.z,0,11,dt)}if(Math.hypot(velocity.x,velocity.z)>.12){player.rotation.y=yaw;player.position.x+=velocity.x*dt;player.position.z+=velocity.z*dt}player.position.x=THREE.MathUtils.clamp(player.position.x,-5.4,5.4);vy-=20*dt;player.position.y+=vy*dt;if(player.position.y<=0){player.position.y=0;vy=0;onGround=true}
-for(let c of coins)if(c.visible&&player.position.distanceTo(c.position)<1.15){c.visible=false;collected++;score+=100;document.querySelector('#coins').textContent=collected;document.querySelector('#score').textContent=score;document.querySelector('#message').textContent='رائع! عملة جديدة 🪙';burst(c.position,0xffd43b,16)}
-for(let h of hazards){h.position.x=Math.sin(t*1.35+h.userData.phase)*1.45;if(Math.abs(player.position.z-h.position.z)<.8&&Math.abs(player.position.x-h.position.x)<1.35&&player.position.y<.85){player.position.z+=2.3;velocity.multiplyScalar(.25);score=Math.max(0,score-50);document.querySelector('#score').textContent=score;document.querySelector('#message').textContent='خد بالك من الحاجز! حاول تقفز 😅';burst(player.position.clone().add(new THREE.Vector3(0,.6,0)),0xff765e,10)}}
-for(let p of pads)if(Math.abs(player.position.z-p.z)<.8&&Math.abs(player.position.x-p.x)<.8&&onGround){vy=11;onGround=false;document.querySelector('#message').textContent='قفزة خارقة! 🚀';burst(p.mesh.position.clone().add(new THREE.Vector3(0,.4,0)),0x55fff0,18)} }
-for(let c of coins)if(c.visible){c.rotation.y+=dt*2.4;c.position.y=1.25+Math.sin(t*2+c.position.z)*.15}hazards.forEach((h,i)=>{h.rotation.y=Math.sin(t*1.4+h.userData.phase)*.16});pads.forEach(p=>p.ring.rotation.z+=dt*.7);water.material.opacity=.78+Math.sin(t*2.2)*.08;waterfall.scale.y=1+Math.sin(t*5)*.035;waterfall.position.x=9.1+Math.sin(t*3)*.08;bonusCoins.forEach(c=>{c.rotation.y+=dt*2.8;c.position.y=3.05+Math.sin(t*2.5+c.position.x)*.12;if(active&&c.visible&&player.position.distanceTo(c.position)<1.35){c.visible=false;collected++;score+=250;document.querySelector('#coins').textContent=collected;document.querySelector('#score').textContent=score;document.querySelector('#message').textContent='لقيت كنز سري! +250 نقطة ✨';burst(c.position,0xffd43b,22)}});fireflies.forEach(f=>{f.mesh.position.y=1.2+Math.sin(t*2+f.phase)*.5;f.mesh.material.emissive=new THREE.Color(0x665522);f.mesh.material.emissiveIntensity=.7+Math.sin(t*4+f.phase)*.4});
-let sp=Math.hypot(velocity.x,velocity.z),walking=active&&sp>.2,air=player.position.y>.03;if(walking&&onGround)phase+=dt*(running?13.5:9)*Math.min(1,sp/6);let s=Math.sin(phase),o=Math.sin(phase+Math.PI);legs[0].rotation.x=air?-.45:s*.7;legs[1].rotation.x=air?-.45:o*.7;arms[0].rotation.x=air?-.8:-s*.5;arms[1].rotation.x=air?-.8:-o*.5;torso.position.y=air?0:(walking?Math.abs(Math.sin(phase*2))*.04:Math.sin(t*2)*.012);torso.rotation.x=THREE.MathUtils.damp(torso.rotation.x,air?-.15:0,7,dt);tail.rotation.z=Math.sin(t*3+phase*.4)*(.1+Math.min(sp/12,.2));
-for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.life-=dt;p.vel.y-=8*dt;p.mesh.position.addScaledVector(p.vel,dt);p.mesh.scale.setScalar(Math.max(.01,p.life));if(p.life<=0){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();particles.splice(i,1)}}
-let dist=7.3*Math.cos(camPitch);desired.set(player.position.x+Math.sin(camYaw)*dist,player.position.y+4.5+camPitch*5,player.position.z+Math.cos(camYaw)*dist);camera.position.lerp(desired,1-Math.exp(-4.8*dt));look.lerp(new THREE.Vector3(player.position.x-Math.sin(camYaw),1.45+player.position.y,player.position.z-Math.cos(camYaw)),1-Math.exp(-7*dt));camera.lookAt(look);document.querySelector('#time').textContent=Math.ceil(remaining)}
-function animate(){requestAnimationFrame(animate);let dt=Math.min(clock.getDelta(),.04);update(dt,clock.elapsedTime);renderer.render(scene,camera)}animate();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-</script></body></html>
+:root{--gold:#ffd45a;--pink:#ff6aa8;--blue:#63d8ff;--panel:rgba(15,20,48,.88)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#10152d;font-family:system-ui,"Segoe UI",Tahoma,sans-serif;color:#fff;touch-action:none}
+#game{position:fixed;inset:0}canvas{display:block}
+#hud{position:fixed;inset:0;pointer-events:none}
+.panel{background:var(--panel);border:1px solid #ffffff2b;border-radius:16px;box-shadow:0 8px 24px #0006;backdrop-filter:blur(8px)}
+#top{position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+#stats{padding:8px 12px;min-width:150px;font-weight:800;font-size:13px}
+#hearts{font-size:20px;letter-spacing:2px;color:#ff6687}
+#mission{padding:8px 12px;text-align:center;font-size:12px;max-width:44%}
+#menuBtn{pointer-events:auto;border:0;color:white;padding:10px 13px;font-weight:900;background:#493b91;border-radius:12px}
+#bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom,8px) + 8px);left:12px;right:12px;display:flex;justify-content:space-between;align-items:end}
+#stick{width:126px;height:126px;border-radius:50%;background:#ffffff20;border:2px solid #ffffff55;position:relative;pointer-events:auto;touch-action:none}
+#knob{width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#fff,#8adfff);position:absolute;left:35px;top:35px;box-shadow:0 4px 14px #0008}
+.actions{display:flex;gap:10px;align-items:end;pointer-events:auto}
+.act{width:66px;height:66px;border:2px solid #ffffff55;border-radius:50%;background:linear-gradient(145deg,#ffcf55,#ff7d42);color:#291d36;font-weight:1000;font-size:13px;box-shadow:0 6px 16px #0008}
+.act.blue{background:linear-gradient(145deg,#8be8ff,#428dff)}.act.pink{background:linear-gradient(145deg,#ffb1d4,#ed4e91)}
+#hint{position:absolute;bottom:150px;left:50%;transform:translateX(-50%);font-size:11px;color:#fff;background:#10152dcc;padding:6px 10px;border-radius:20px;white-space:nowrap}
+#overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#121735eF,#271b4af2);z-index:5;padding:16px}
+.card{width:min(560px,100%);max-height:94%;overflow:auto;padding:20px;text-align:center;border-radius:24px;background:linear-gradient(145deg,#252c60,#151a3b);border:1px solid #ffffff35;box-shadow:0 20px 60px #0009}
+h1{margin:0 0 4px;font-size:clamp(26px,6vw,42px);color:var(--gold);text-shadow:0 4px 0 #8c4c21}
+.sub{color:#d9e6ff;font-size:13px;margin-bottom:16px}
+#characters{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:14px 0}
+.char{border:2px solid #ffffff30;border-radius:14px;padding:8px 4px;background:#ffffff10;color:white;font-weight:800}
+.char.selected{border-color:var(--gold);background:#ffd45a24}
+.avatar{font-size:34px;display:block}
+button{font-family:inherit;cursor:pointer}
+.primary{border:0;border-radius:14px;padding:13px 24px;font-weight:1000;font-size:17px;color:#35203b;background:linear-gradient(90deg,#ffe477,#ff9f45);box-shadow:0 6px 0 #9b552e}
+.secondary{border:1px solid #ffffff44;border-radius:12px;padding:10px 14px;color:#fff;background:#ffffff12;font-weight:800}
+.row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.small{font-size:11px;color:#bfc9ec;line-height:1.7;margin-top:14px}
+#toast{position:fixed;top:25%;left:50%;transform:translate(-50%,-50%);background:#111936eF;border:1px solid #ffffff55;padding:12px 18px;border-radius:14px;z-index:9;display:none;font-weight:900}
+#adslot{margin-top:14px;min-height:42px;border:1px dashed #ffffff44;border-radius:10px;padding:9px;color:#9eacd5;font-size:10px}
+@media(orientation:portrait){#rotate{display:flex}}
+#rotate{display:none;position:fixed;inset:0;z-index:20;background:#11152e;align-items:center;justify-content:center;text-align:center;padding:28px;font-size:20px;font-weight:900}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="hud">
+ <div id="top">
+  <div id="stats" class="panel"><div>🪙 <span id="coins">0</span> &nbsp; ⭐ <span id="score">0</span></div><div id="hearts">❤️❤️❤️</div></div>
+  <div id="mission" class="panel">اجمع العملات وتجنب الوحوش<br><b id="level">المرحلة 1</b></div>
+  <button id="menuBtn">القائمة ☰</button>
+ </div>
+ <div id="hint">اسحب العصا للحركة • اسحب يمين الشاشة لتدوير الكاميرا</div>
+ <div id="bottom">
+  <div id="stick"><div id="knob"></div></div>
+  <div class="actions">
+   <button class="act pink" id="dodge">تفادي</button>
+   <button class="act blue" id="jump">قفز</button>
+   <button class="act" id="attack">هجوم</button>
+  </div>
+ </div>
+</div>
+<div id="overlay">
+ <div class="card">
+  <h1>فوضى التحديات</h1><div class="sub">V11 • مغامرة الحيوانات 🦊</div>
+  <div>اختار بطلك قبل بداية المغامرة</div>
+  <div id="characters">
+   <button class="char selected" data-char="fox"><span class="avatar">🦊</span>الثعلب</button>
+   <button class="char" data-char="panda"><span class="avatar">🐼</span>الباندا</button>
+   <button class="char" data-char="cat"><span class="avatar">🐱</span>القطة</button>
+   <button class="char" data-char="rabbit"><span class="avatar">🐰</span>الأرنب</button>
+   <button class="char" data-char="bear"><span class="avatar">🐻</span>الدب</button>
+   <button class="char" data-char="penguin"><span class="avatar">🐧</span>البطريق</button>
+  </div>
+  <button class="primary" id="start">ابدأ المغامرة 🚀</button>
+  <div class="row"><button class="secondary" id="how">طريقة اللعب</button><button class="secondary" id="reset">إعادة التقدم</button></div>
+  <div class="small">نسخة ويب تجريبية قابلة للتطوير. احفظ تقدمك على نفس الجهاز تلقائيًا.</div>
+  <div id="adslot">مساحة إعلانية اختيارية — يتم تفعيل الإعلانات بعد ربط حساب وشبكة إعلانية معتمدة.</div>
+ </div>
+</div>
+<div id="toast"></div>
+<div id="rotate">📱<br>لف الموبايل بالعرض عشان تلعب<br><small>Rotate your phone</small></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(()=> {
+const $=id=>document.getElementById(id);
+const overlay=$('overlay'), toast=$('toast');
+let selected='fox', started=false, health=3, coins=+(localStorage.fawdaCoins||0), score=+(localStorage.fawdaScore||0);
+let scene,camera,renderer,player,clock,vel=new THREE.Vector3(),yaw=0,cameraYaw=0, invuln=0, attackTimer=0,dodgeTimer=0,jumpV=0;
+let enemies=[],collectibles=[],obstacles=[],world=[];
+const colors={fox:0xf28b36,panda:0xe9edf5,cat:0xf3a5c7,rabbit:0xf5f1e9,bear:0x98603c,penguin:0x303c5b};
+const emoji={fox:'🦊',panda:'🐼',cat:'🐱',rabbit:'🐰',bear:'🐻',penguin:'🐧'};
+function notify(t){toast.textContent=t;toast.style.display='block';setTimeout(()=>toast.style.display='none',1600)}
+function init(){
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x8bd4ef);scene.fog=new THREE.Fog(0x8bd4ef,32,95);
+ camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,150);
+ renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;$('game').appendChild(renderer.domElement);
+ scene.add(new THREE.HemisphereLight(0xd9f4ff,0x53613c,2));
+ const sun=new THREE.DirectionalLight(0xfff1d1,2.4);sun.position.set(-12,22,10);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
+ const ground=new THREE.Mesh(new THREE.PlaneGeometry(110,110),new THREE.MeshStandardMaterial({color:0x5dba69,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+ // stylized island paths and water
+ const path=new THREE.Mesh(new THREE.CircleGeometry(13,64),new THREE.MeshStandardMaterial({color:0xbda77a}));path.rotation.x=-Math.PI/2;path.position.y=.015;path.scale.set(1,1.35,1);scene.add(path);
+ const lake=new THREE.Mesh(new THREE.CircleGeometry(7,48),new THREE.MeshStandardMaterial({color:0x35bde2,metalness:.2,roughness:.2}));lake.rotation.x=-Math.PI/2;lake.position.set(17,.03,-13);scene.add(lake);
+ for(let i=0;i<38;i++){let a=Math.random()*Math.PI*2,r=18+Math.random()*25,x=Math.cos(a)*r,z=Math.sin(a)*r;tree(x,z)}
+ for(let i=0;i<12;i++){let x=(Math.random()-.5)*32,z=(Math.random()-.5)*32;if(Math.hypot(x,z)>7)rock(x,z)}
+ for(let i=0;i<18;i++){let x=(Math.random()-.5)*30,z=(Math.random()-.5)*30;if(Math.hypot(x,z)>5)addCoin(x,z)}
+ for(let i=0;i<5;i++){let x=(Math.random()-.5)*28,z=(Math.random()-.5)*28;if(Math.hypot(x,z)>9)addEnemy(x,z)}
+ makePlayer();
+ clock=new THREE.Clock();animate();
+}
+function tree(x,z){let g=new THREE.Group();let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.25,.38,2,7),new THREE.MeshStandardMaterial({color:0x79502d}));trunk.position.y=1;trunk.castShadow=true;g.add(trunk);for(let j=0;j<3;j++){let m=new THREE.Mesh(new THREE.SphereGeometry(1.15-j*.12,9,8),new THREE.MeshStandardMaterial({color:[0x25834b,0x319b55,0x48ad5d][j]}));m.position.set((Math.random()-.5)*.35,2.2+j*.55,0);m.castShadow=true;g.add(m)}g.position.set(x,0,z);scene.add(g);world.push(g)}
+function rock(x,z){let m=new THREE.Mesh(new THREE.DodecahedronGeometry(.7+Math.random()*.7,0),new THREE.MeshStandardMaterial({color:0x87949a,roughness:1}));m.position.set(x,.45,z);m.scale.y=.7;m.castShadow=true;scene.add(m);obstacles.push(m)}
+function makeAnimal(kind,scale=1){
+ let group=new THREE.Group(), bodyMat=new THREE.MeshStandardMaterial({color:colors[kind]||0xffffff,roughness:.8}),white=new THREE.MeshStandardMaterial({color:kind==='panda'?0x202538:0xfff2dc}),dark=new THREE.MeshStandardMaterial({color:0x24263a});
+ const body=new THREE.Mesh(new THREE.SphereGeometry(.58,16,12),bodyMat);body.scale.set(.9,1.05,.72);body.position.y=.9;body.castShadow=true;group.add(body);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.52,16,12),bodyMat);head.position.set(0,1.72,.12);head.castShadow=true;group.add(head);
+ const muzzle=new THREE.Mesh(new THREE.SphereGeometry(.28,12,10),white);muzzle.scale.set(1,.7,.65);muzzle.position.set(0,1.59,.55);group.add(muzzle);
+ const eyeMat=new THREE.MeshStandardMaterial({color:0x171827});
+ for(let s of [-1,1]){let eye=new THREE.Mesh(new THREE.SphereGeometry(.055,8,8),eyeMat);eye.position.set(s*.19,1.83,.57);group.add(eye);
+ let ear=new THREE.Mesh(new THREE.SphereGeometry(kind==='rabbit'?.22:.17,10,8),bodyMat);ear.position.set(s*.37,2.12,.1);ear.scale.y=kind==='rabbit'?1.8:1;group.add(ear)}
+ const nose=new THREE.Mesh(new THREE.SphereGeometry(.07,8,8),dark);nose.position.set(0,1.61,.78);group.add(nose);
+ const legs=[];for(let s of [-1,1])for(let z of [-1,1]){let leg=new THREE.Mesh(new THREE.CapsuleGeometry(.14,.42,3,7),bodyMat);leg.position.set(s*.29,.38,z*.25);leg.castShadow=true;group.add(leg);legs.push(leg)}
+ if(kind==='fox'){let tail=new THREE.Mesh(new THREE.ConeGeometry(.28,.95,10),bodyMat);tail.position.set(0,.95,-.75);tail.rotation.x=-1.1;group.add(tail);let tip=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),white);tip.position.set(0,.65,-1.02);group.add(tip)}
+ if(kind==='panda'){for(let s of [-1,1]){let patch=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),dark);patch.position.set(s*.2,1.82,.55);patch.scale.set(1,1.2,.35);group.add(patch)}}
+ group.scale.setScalar(scale);group.userData.legs=legs;return group;
+}
+function makePlayer(){if(player)scene.remove(player);player=makeAnimal(selected,1);player.position.set(0,0,0);scene.add(player);yaw=0}
+function addCoin(x,z){let m=new THREE.Mesh(new THREE.TorusGeometry(.34,.12,8,18),new THREE.MeshStandardMaterial({color:0xffd447,metalness:.7,roughness:.2,emissive:0x7a4b00}));m.position.set(x,.85,z);m.rotation.x=Math.PI/2;scene.add(m);collectibles.push(m)}
+function addEnemy(x,z){let kind=['bear','cat','penguin'][Math.floor(Math.random()*3)],m=makeAnimal(kind,.8);m.position.set(x,0,z);scene.add(m);enemies.push({mesh:m,kind,hp:2,phase:Math.random()*6})}
+function animate(){
+ requestAnimationFrame(animate);let dt=Math.min(clock.getDelta(),.04),t=clock.elapsedTime;
+ if(started&&player){
+  invuln=Math.max(0,invuln-dt);attackTimer=Math.max(0,attackTimer-dt);dodgeTimer=Math.max(0,dodgeTimer-dt);
+  const input=stick;let forward=new THREE.Vector3(Math.sin(cameraYaw),0,Math.cos(cameraYaw));let right=new THREE.Vector3(forward.z,0,-forward.x);
+  let dir=right.clone().multiplyScalar(input.x).add(forward.clone().multiplyScalar(input.y));if(dir.length()>1)dir.normalize();
+  let speed=dodgeTimer>0?12:5.8;vel.x+=(dir.x*speed-vel.x)*Math.min(1,dt*8);vel.z+=(dir.z*speed-vel.z)*Math.min(1,dt*8);
+  player.position.x+=vel.x*dt;player.position.z+=vel.z*dt;
+  player.position.x=THREE.MathUtils.clamp(player.position.x,-28,28);player.position.z=THREE.MathUtils.clamp(player.position.z,-28,28);
+  if(dir.lengthSq()>.02){let target=Math.atan2(dir.x,dir.z);let diff=Math.atan2(Math.sin(target-yaw),Math.cos(target-yaw));yaw+=diff*Math.min(1,dt*10)}
+  player.rotation.y=yaw;player.position.y=Math.max(0,player.position.y+jumpV*dt);jumpV-=18*dt;if(player.position.y<0){player.position.y=0;jumpV=0}
+  player.userData.legs.forEach((l,i)=>{l.rotation.x=Math.sin(t*11+i*Math.PI)*Math.min(.65,dir.length()*.65)});
+  let camTarget=new THREE.Vector3(player.position.x-Math.sin(cameraYaw)*7,player.position.y+4.2,player.position.z-Math.cos(cameraYaw)*7);
+  camera.position.lerp(camTarget,1-Math.exp(-5*dt));camera.lookAt(player.position.x,player.position.y+1.15,player.position.z);
+  collectibles.forEach((c,i)=>{c.rotation.z+=dt*2.2;c.position.y=.85+Math.sin(t*3+i)*.12;if(c.position.distanceTo(new THREE.Vector3(player.position.x,1,player.position.z))<1.15){scene.remove(c);collectibles.splice(i,1);coins++;score+=10;$('coins').textContent=coins;$('score').textContent=score;localStorage.fawdaCoins=coins;localStorage.fawdaScore=score;addCoin((Math.random()-.5)*34,(Math.random()-.5)*34)}});
+  enemies.forEach(e=>{let d=new THREE.Vector3().subVectors(player.position,e.mesh.position);let dist=d.length();e.phase+=dt;if(dist<13){d.y=0;d.normalize();e.mesh.position.addScaledVector(d,dt*(dist<2?1.5:2.3));e.mesh.rotation.y=Math.atan2(d.x,d.z)}else e.mesh.position.x+=Math.sin(e.phase)*dt*.35;
+   if(dist<1.25&&invuln<=0&&dodgeTimer<=0){health--;invuln=1.25;updateHearts();player.position.addScaledVector(d,-1.2);if(health<=0){started=false;notify('انتهت المحاولة! افتح القائمة وابدأ من جديد');overlay.style.display='flex'}}
+   if(attackTimer>0&&dist<2.4){e.hp-=dt*3;if(e.hp<=0){scene.remove(e.mesh);enemies.splice(enemies.indexOf(e),1);score+=50;$('score').textContent=score;localStorage.fawdaScore=score;notify('هزمت خصمًا! +50 ⭐')}}
+  });
+  if(enemies.length<3&&Math.random()<dt*.08)addEnemy((Math.random()-.5)*30,(Math.random()-.5)*30);
+ }
+ renderer.render(scene,camera);
+}
+function updateHearts(){$('hearts').textContent='❤️'.repeat(Math.max(0,health))+'🖤'.repeat(3-Math.max(0,health))}
+let stick={x:0,y:0},activePointer=null,camPointer=null,lastX=0;
+const stickEl=$('stick'),knob=$('knob');
+stickEl.addEventListener('pointerdown',e=>{activePointer=e.pointerId;stickEl.setPointerCapture(e.pointerId);moveStick(e)});
+stickEl.addEventListener('pointermove',e=>{if(e.pointerId===activePointer)moveStick(e)});
+function moveStick(e){let r=stickEl.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),len=Math.hypot(dx,dy),max=42;if(len>max){dx*=max/len;dy*=max/len}knob.style.transform=`translate(${dx}px,${dy}px)`;stick={x:dx/max,y:-dy/max}}
+function resetStick(){activePointer=null;stick={x:0,y:0};knob.style.transform='translate(0,0)'}
+stickEl.addEventListener('pointerup',resetStick);stickEl.addEventListener('pointercancel',resetStick);
+rendererPointerSetup();
+function rendererPointerSetup(){const el=$('game');el.addEventListener('pointerdown',e=>{if(e.clientX>innerWidth*.48){camPointer=e.pointerId;lastX=e.clientX}});el.addEventListener('pointermove',e=>{if(e.pointerId===camPointer){cameraYaw-=(e.clientX-lastX)*.006;lastX=e.clientX}});el.addEventListener('pointerup',e=>{if(e.pointerId===camPointer)camPointer=null});}
+$('jump').onclick=()=>{if(player&&player.position.y<.05)jumpV=7.5};
+$('attack').onclick=()=>{attackTimer=.45;notify('هجوم!')};
+$('dodge').onclick=()=>{dodgeTimer=.35;invuln=Math.max(invuln,.45)};
+$('menuBtn').onclick=()=>{started=false;overlay.style.display='flex'};
+document.querySelectorAll('.char').forEach(b=>b.onclick=()=>{selected=b.dataset.char;document.querySelectorAll('.char').forEach(x=>x.classList.toggle('selected',x===b));if(player)makePlayer()});
+$('start').onclick=()=>{if(!scene)init();health=3;updateHearts();started=true;overlay.style.display='none';if(player)makePlayer();notify('انطلق! اجمع العملات واهزم الأعداء')};
+$('how').onclick=()=>notify('العصا للحركة • يمين الشاشة للكاميرا • الأزرار للقفز والهجوم والتفادي');
+$('reset').onclick=()=>{coins=0;score=0;localStorage.fawdaCoins=0;localStorage.fawdaScore=0;$('coins').textContent=0;$('score').textContent=0;notify('تم تصفير العملات والنقاط')};
+$('coins').textContent=coins;$('score').textContent=score;
+function resize(){if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);$('rotate').style.display=innerHeight>innerWidth?'flex':'none'}
+addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));
+if(!('ontouchstart'in window))$('hint').textContent='WASD للحركة • اسحب يمين الشاشة للكاميرا • الأزرار للقفز والهجوم';
+})();
+</script>
+</body></html>
